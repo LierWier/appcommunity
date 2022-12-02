@@ -8,4 +8,5 @@ public interface UserService {
     Map<String, Object> getUserList(User queryUser);
     Map<String, Object> getToken(String username, String password);
     Map<String, Object> register(String username, String password, String confirmedPassword);
+    Map<String, Object> getInfo();
 }

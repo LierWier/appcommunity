@@ -13,14 +13,16 @@ import RegisterView from '../views/user/RegisterView.vue'
 import UserView from '../views/user/UserView.vue'
 import NotFoundView from '../views/notFound/NotFoundView.vue'
 import TextView from '../views/TextView.vue'
+import {AjaxUtils} from "@/assets/utils/ajaxUtils";
+import store from "@/store";
 
 const routes = [
-    {path: '/', name: 'index', component: HomeView},
-    {path: '/home', name: 'home', component: HomeView},
-    {path: '/square', name: 'square', component: SquareView},
-    {path: '/rank', name: 'rank', omponent: RankView},
-    {path: '/app', name: 'app', component: AppView},
-    {path: '/user', name: 'user', component: UserView},
+    {path: '/', name: 'index', component: HomeView, meta: {title: "AppHub"}},
+    {path: '/home', name: 'home', component: HomeView, meta: {title: "AppHub"}},
+    {path: '/square', name: 'square', component: SquareView, meta: {title: "AppHub - square"}},
+    {path: '/rank', name: 'rank', component: RankView, meta: {title: "AppHub - rank"}},
+    {path: '/app', name: 'app', component: AppView, meta: {title: "AppHub - app"}},
+    {path: '/user', name: 'user', component: UserView, meta: {title: "AppHub - user"}},
     {
         path: '/admin', name: 'admin', component: AdminView, redirect: '/admin/usermanage', children: [
             {path: '/admin/usermanage', name: 'user_manage', component: UserManageView},
@@ -38,6 +40,26 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(),
     routes
+})
+
+router.beforeEach(async (to, from, next) => {
+    console.log(to)
+    window.document.title = to.meta.title || "AppHub"
+    if (!store.state.user.is_login) {
+        const token = localStorage.getItem("jwt_token")
+        if (token) {
+            store.commit("updateToken", token)
+            const resp = await AjaxUtils.getInfo(token)
+            if (resp.msg === "success") {
+                store.commit("updateUser", resp.data)
+                store.commit("updateLogin", true)
+                next()
+            } else {
+                localStorage.removeItem("jwt_token")
+                store.commit("updateLoginDialogVisible", true)
+            }
+        } else next()
+    } else next()
 })
 
 export default router

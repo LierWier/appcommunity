@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class UserSeriviceImpl implements UserService {
+public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
     @Autowired
@@ -48,17 +50,30 @@ public class UserSeriviceImpl implements UserService {
      */
     @Override
     public Map<String, Object> getToken(String username, String password) {
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(username, password);
-        Authentication authenticate = authenticationManager.authenticate(authenticationToken);
-        UserDetailsImpl loginUser = (UserDetailsImpl) authenticate.getPrincipal();
-        User user = loginUser.getUser();
-
-        String token = JwtUtil.createJWT(user.getId().toString());
-
         Map<String, Object> map = new HashMap<>();
-        map.put("msg", "success");
-        map.put("token", token);
+
+        try {
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(username, password);
+            Authentication authenticate = authenticationManager.authenticate(authenticationToken);
+            UserDetailsImpl loginUser = (UserDetailsImpl) authenticate.getPrincipal();
+            User user = loginUser.getUser();
+            String token = JwtUtil.createJWT(user.getId().toString());
+
+            if (user.getStatus() == 0) {
+                map.put("msg", "账号已被封禁！");
+                return map;
+            }
+            if (user.getStatus() == -1) {
+                map.put("msg", "error");
+                return map;
+            }
+            map.put("msg", "success");
+            map.put("data", token);
+        } catch (AuthenticationException e) {
+            map.put("msg", "error");
+            return map;
+        }
         return map;
     }
 
@@ -112,6 +127,34 @@ public class UserSeriviceImpl implements UserService {
         user.setCreateTime(new Date());
         userMapper.insert(user);
         map.put("msg", "success");
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> getInfo() {
+        Map<String, Object> map = new HashMap<>();
+
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+
+            UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+            User user = loginUser.getUser();
+            if (user.getStatus() == 0) {
+                map.put("msg", "账号已被封禁！");
+                return map;
+            }
+            if (user.getStatus() == -1) {
+                map.put("msg", "error");
+                return map;
+            }
+            user.setPassword("");
+            map.put("msg", "success");
+            map.put("data", user);
+        } catch (Exception e) {
+            map.put("msg", "error");
+        }
+
         return map;
     }
 }

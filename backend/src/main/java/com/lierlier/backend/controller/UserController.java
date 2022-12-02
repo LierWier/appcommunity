@@ -22,17 +22,17 @@ public class UserController {
     }
 
     @PostMapping("/gettoken")
-    public Map<String, Object> getToken(Map<String, String> data) {
-        String username = data.get("username");
-        String password = data.get("password");
+    public Map<String, Object> getToken(String username, String password) {
         return userService.getToken(username, password);
     }
 
     @PostMapping("/register")
     public Map<String, Object> register(String username, String password, String confirmedPassword) {
-//        String username = map.get("username");
-//        String password = map.get("password");
-//        String confirmedPassword = map.get("confirmedPassword");
         return userService.register(username, password, confirmedPassword);
+    }
+
+    @GetMapping("/getinfo")
+    public Map<String, Object> getInfo() {
+        return userService.getInfo();
     }
 }
