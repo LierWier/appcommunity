@@ -1,13 +1,14 @@
 const ModuleUser = {
     state: {
-        user: {},
+        info: {},
         is_login: false,
+        token: "",
     },
     getters: {
     },
     mutations: {
-        updateUser(state, user) {
-            state.user = user
+        updateInfo(state, user) {
+            state.info = user
         },
         updateToken(state, token) {
             state.token = token

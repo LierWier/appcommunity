@@ -20,7 +20,8 @@ public class User {
     private Integer isManager;
     private String photo;
     private String tel;
-    private Integer age;
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
+    private Date birth;
     private String sex;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private Date createTime;

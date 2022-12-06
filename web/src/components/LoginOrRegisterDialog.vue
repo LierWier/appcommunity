@@ -66,9 +66,9 @@ const login = async () => {
   const resp = await AjaxUtils.login(form)
   if (resp.msg === "success") {
     store.commit("updateToken", resp.data)
-    const res = await AjaxUtils.getInfo(resp.data)
+    const res = await AjaxUtils.getInfo()
     if (res.msg === "success") {
-      store.commit("updateUser", res.data)
+      store.commit("updateInfo", res.data)
       store.commit("updateLogin", true)
       ElMessage.success("登录成功！")
       store.commit("updateLoginDialogVisible", false)
@@ -103,7 +103,6 @@ const register = (formRef) => {
 }
 
 const onClose = () => {
-  console.log("close")
   form.username = form.password = form.confirmedPassword = ''
   formRef.value.resetFields()
   isRegister.value = false

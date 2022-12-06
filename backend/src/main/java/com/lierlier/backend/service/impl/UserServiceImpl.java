@@ -1,6 +1,7 @@
 package com.lierlier.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.lierlier.backend.mapper.UserMapper;
 import com.lierlier.backend.pojo.User;
 import com.lierlier.backend.service.UserService;
@@ -28,19 +29,6 @@ public class UserServiceImpl implements UserService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Override
-    public Map<String, Object> getUserList(User queryUser) {
-        HashMap<String, Object> map = new HashMap<>();
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        List<User> users = userMapper.selectList(queryWrapper);
-        for (User user: users) {
-            user.setPassword("");
-        }
-        map.put("msg", "success");
-        map.put("users", users);
-        return map;
-    }
 
     /**
      * 登录 获取 JWT-token
@@ -156,5 +144,95 @@ public class UserServiceImpl implements UserService {
         }
 
         return map;
+    }
+
+    @Override
+    public Map<String, Object> getUserList(Map<String, Object> queryUser) {
+        HashMap<String, Object> map = new HashMap<>();
+        User user;
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+            user = loginUser.getUser();
+        } catch (Exception e) {
+            map.put("msg", "该用户不存在！");
+            return map;
+        }
+        if (user.getIsManager() == 0) {
+            map.put("msg", "无权限！");
+            return map;
+        }
+
+        String username = (String) queryUser.get("username");
+        String tel = (String) queryUser.get("tel");
+        String sex = (String) queryUser.get("sex");
+        String status = (String) queryUser.get("status");
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+
+        if (StringUtils.isNotEmpty(username)) queryWrapper.like("username", username);
+        if (StringUtils.isNotEmpty(tel)) queryWrapper.like("tel", tel);
+        if (StringUtils.isNotEmpty(sex)) queryWrapper.eq("sex", sex);
+        if (StringUtils.isNotEmpty(status)) queryWrapper.eq("status", Integer.parseInt(status));
+
+        List<User> users = userMapper.selectList(queryWrapper);
+        for (User u: users) {
+            u.setPassword("");
+        }
+        map.put("msg", "success");
+        map.put("users", users);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> updateStatus(Integer id, Integer status) {
+        HashMap<String, Object> map = new HashMap<>();
+
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+            User user = loginUser.getUser();
+            if (user.getIsManager() < 1) {
+                map.put("msg", "无权限");
+                return map;
+            }
+        } catch (Exception e) {
+            map.put("msg", "该用户不存在！");
+            return map;
+        }
+
+        User user = userMapper.selectById(id);
+        user.setStatus(status);
+        userMapper.updateById(user);
+
+        map.put("msg", "success");
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> addUser(User user) {
+        HashMap<String, Object> map = new HashMap<>();
+        String msg = commonValid(user);
+        map.put("msg", msg);
+        if (!"success".equals(msg)) return map;
+        String password = passwordEncoder.encode(user.getPassword());
+        user.setPassword(password);
+        if (StringUtils.isEmpty(user.getTel())) user.setTel(null);
+        if (StringUtils.isEmpty(user.getSex())) user.setSex(null);
+        user.setCreateTime(new Date());
+        userMapper.insert(user);
+        return map;
+    }
+
+    private String commonValid(User user) {
+        if (StringUtils.isEmpty(user.getUsername())) return "用户名不能为空！";
+        if (StringUtils.isEmpty(user.getPassword())) return "密码不能为空！";
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", user.getUsername());
+        List<User> users = userMapper.selectList(queryWrapper);
+        if (!users.isEmpty()) return "用户名已存在";
+        return "success";
     }
 }

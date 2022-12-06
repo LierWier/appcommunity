@@ -43,15 +43,14 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-    console.log(to)
     window.document.title = to.meta.title || "AppHub"
     if (!store.state.user.is_login) {
         const token = localStorage.getItem("jwt_token")
         if (token) {
             store.commit("updateToken", token)
-            const resp = await AjaxUtils.getInfo(token)
+            const resp = await AjaxUtils.getInfo()
             if (resp.msg === "success") {
-                store.commit("updateUser", resp.data)
+                store.commit("updateInfo", resp.data)
                 store.commit("updateLogin", true)
                 next()
             } else {
