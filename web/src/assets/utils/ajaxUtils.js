@@ -4,6 +4,7 @@ import store from "@/store";
 const ip = `127.0.0.1`;
 const port = 3001;
 const cutUrl = `http://${ip}:${port}/api`
+
 const getTokenUrl = cutUrl + `/user/gettoken`;
 const registerUrl = cutUrl + `/user/register`;
 const getInfoUrl = cutUrl + `/user/getinfo`;
@@ -11,26 +12,29 @@ const getUserListUrl = cutUrl + `/user/getuserlist`;
 const updateUserStatusUrl = cutUrl + `/user/updateStatus`;
 const addUserUrl = cutUrl + `/user/add`;
 
+const getAppListUrl = cutUrl + `/app/getapplist`;
+const getAppCategoryUrl = cutUrl + `/app/getappcategory`;
+
 export const AjaxUtils = {
     login: async (data) => {
-        let resp
+        let resp;
         await $.post(getTokenUrl, data, (res) => {
             console.log(res)
             resp = res;
         })
-        return resp
+        return resp;
     },
 
     register: async (data) => {
-        let resp
+        let resp;
         await $.post(registerUrl, data, (res) => {
-            resp = res
+            resp = res;
         })
-        return resp
+        return resp;
     },
 
     getInfo: async () => {
-        let resp
+        let resp;
         await $.ajax({
             url: getInfoUrl,
             type: "get",
@@ -38,14 +42,14 @@ export const AjaxUtils = {
                 Authorization: "Bearer " + store.state.user.token
             },
             success(res) {
-                resp = res
+                resp = res;
             }
         })
-        return resp
+        return resp;
     },
 
     getUserList: async (data) => {
-        let resp
+        let resp;
         await $.ajax({
             url: getUserListUrl,
             data: data,
@@ -54,7 +58,7 @@ export const AjaxUtils = {
                 Authorization: "Bearer " + store.state.user.token
             },
             success(res) {
-                resp = res
+                resp = res;
             }
         })
         return resp;
@@ -70,16 +74,29 @@ export const AjaxUtils = {
                 Authorization: "Bearer " + store.state.user.token
             },
             success(res) {
-                resp = res
+                resp = res;
             }
         })
         return resp;
     },
+
     addUser: async (data) => {
         let resp;
         await $.post(addUserUrl, data, (res) => {
-            resp = res
+            resp = res;
         })
-        return resp
+        return resp;
+    },
+
+    getAppList: async (data) => {
+        let resp;
+        await $.get(getAppListUrl, data, (res) => {
+            resp = res;
+        })
+        return resp;
+    },
+
+    getAppCategory: () => {
+        return fetch(getAppCategoryUrl).then(res => { return res.json() })
     }
 }

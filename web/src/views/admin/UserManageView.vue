@@ -25,7 +25,7 @@
       <el-button type="primary" @click="getUserList">查询</el-button>
     </el-form-item>
   </el-form>
-  <el-button @click="addUserDialogVisible = true">添加用户</el-button>
+  <el-button type="primary" plain @click="addUserDialogVisible = true">添加</el-button>
   <el-table
       :data="tableData"
       border style="width: 100%"
@@ -36,11 +36,11 @@
     <el-table-column prop="id" label="UID" align="center" />
     <el-table-column prop="username" label="用户名" align="center" />
     <el-table-column prop="tel" label="电话" align="center" />
-    <el-table-column prop="birth" label="生日" align="center" />
-    <el-table-column prop="sex" label="性别" align="center" />
-    <el-table-column prop="createTime" label="注册时间" align="center" />
-    <el-table-column prop="isManager" label="管理员" :formatter="(_,__,cell) => formatterUtils.isManagerFmt(cell)" align="center" />
-    <el-table-column prop="status" label="状态" :formatter="(_,__,cell) => formatterUtils.userStatusFmt(cell)" align="center" />
+    <el-table-column prop="birth" label="生日" align="center" sortable />
+    <el-table-column prop="sex" label="性别" align="center" sortable />
+    <el-table-column prop="createTime" label="注册时间" align="center" sortable />
+    <el-table-column prop="isManager" label="管理员" sortable :formatter="(_,__,cell) => formatterUtils.isManagerFmt(cell)" align="center" />
+    <el-table-column prop="status" label="状态" sortable :formatter="(_,__,cell) => formatterUtils.userStatusFmt(cell)" align="center" />
     <el-table-column label="操作" align="center" >
       <template #default="scope">
         <el-button link type="primary" @click="banOp(scope.row.id, scope.row.status)">{{ scope.row.status==1?"封禁":(scope.row.status==0?"解禁":"") }}</el-button>
