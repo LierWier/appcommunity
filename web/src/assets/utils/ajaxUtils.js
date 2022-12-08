@@ -14,6 +14,8 @@ const addUserUrl = cutUrl + `/user/add`;
 
 const getAppListUrl = cutUrl + `/app/getapplist`;
 const getAppCategoryUrl = cutUrl + `/app/getappcategory`;
+// const updateAppUrl = cutUrl + `/app/update`;
+const updateAppStatusUrl = cutUrl + `/app/updatestatusbylist`;
 
 export const AjaxUtils = {
     login: async (data) => {
@@ -98,5 +100,27 @@ export const AjaxUtils = {
 
     getAppCategory: () => {
         return fetch(getAppCategoryUrl).then(res => { return res.json() })
-    }
+    },
+
+    // updateApp: (data) => {
+    //
+    // },
+
+    async updateAppStatus(data) {
+        return await $.post(updateAppStatusUrl, data)
+    },
+
+    // text() {
+    //     const json = []
+    //     for (let i = 100000; i < 100500; i++) {
+    //         const data = {}
+    //         data["username"] = i + ""
+    //         data["password"] = i + ""
+    //         const r = Math.floor(Math.random() * 3)
+    //         if (r === 2) data["sex"] = "男"
+    //         else if (r === 1) data["sex"] = "女"
+    //         json.push(data)
+    //     }
+    //     console.log(JSON.stringify(json))
+    // }
 }

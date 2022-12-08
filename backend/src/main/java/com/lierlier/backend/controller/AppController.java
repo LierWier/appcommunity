@@ -38,4 +38,9 @@ public class AppController {
     public Map<String, Object> updateApp(App app) {
         return appService.updateApp(app);
     }
+
+    @PostMapping("/updatestatusbylist")
+    public Map<String, Object> updateAppStatusByList(@RequestParam(value = "ids[]") Integer[] ids, Integer status) {
+        return appService.updateAppStatusByList(ids, status);
+    }
 }

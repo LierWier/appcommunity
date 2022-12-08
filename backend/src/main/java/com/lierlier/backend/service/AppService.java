@@ -11,4 +11,5 @@ public interface AppService {
     Map<String, Object> addApp(App app);
     Map<String, Object> deleteAppByList(List<Integer> ids);
     Map<String, Object> updateApp(App app);
+    Map<String, Object> updateAppStatusByList(Integer[] ids, Integer status);
 }

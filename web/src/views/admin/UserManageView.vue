@@ -25,14 +25,30 @@
       <el-button type="primary" @click="getUserList">查询</el-button>
     </el-form-item>
   </el-form>
-  <el-button type="primary" plain @click="addUserDialogVisible = true">添加</el-button>
+  <el-row style="margin-bottom: 10px">
+    <el-col :span="6">
+      <el-button type="primary" plain @click="addUserDialogVisible = true">添加</el-button>
+    </el-col>
+    <el-col :span="18">
+      <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[20, 50, 100, 200]"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="tableData.length"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          style="float: right"
+      />
+    </el-col>
+  </el-row>
   <el-table
       :data="tableData"
       border style="width: 100%"
       table-layout="auto"
       :row-class-name="tableRowClassName"
   >
-    <el-table-column type="index" align="center" />
+    <el-table-column type="index" align="center" width="50"/>
     <el-table-column prop="id" label="UID" align="center" />
     <el-table-column prop="username" label="用户名" align="center" />
     <el-table-column prop="tel" label="电话" align="center" />
@@ -96,10 +112,20 @@ import {ElMessage} from "element-plus";
 import {ref, reactive} from "vue";
 import formatterUtils from "@/assets/utils/formatterUtils";
 
-let tableData = ref([])
-const queryUser = reactive({username: "", tel: "", sex: "", status: ""})
-const addUserDialogVisible = ref(false)
-const formLabelWidth = "180px"
+let tableData = ref([])  // 表格数据
+const queryUser = reactive({username: "", tel: "", sex: "", status: ""})  // 查询参数
+// 分页配置
+const currentPage = ref(1)  // 当前页
+const pageSize = ref(20)  // 分页大小
+const handleSizeChange = (val) => {
+  console.log(`${val} items per page`)
+}
+const handleCurrentChange = (val) => {
+  console.log(`current page: ${val}`)
+}
+// 添加用户配置
+const addUserDialogVisible = ref(false)  // 添加用户对话框显示
+const formLabelWidth = "180px"  // 标签宽度
 const addUserForm = reactive({username: "", password: "", isManager: null, tel: null, birth: null, sex: null})
 const addUserFormRef = ref({})
 const shortcuts = [
@@ -139,7 +165,11 @@ const rules = reactive({
 })
 
 const getUserList = () => {
-  AjaxUtils.getUserList(queryUser).then((resp) => {
+  AjaxUtils.getUserList({
+    queryUser,
+    page: currentPage.value,
+    pageSize: pageSize.value
+  }).then((resp) => {
     if (resp.msg === "success") tableData.value = resp.users
     else ElMessage.error(resp.msg)
   })

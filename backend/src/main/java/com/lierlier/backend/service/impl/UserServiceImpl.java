@@ -1,7 +1,9 @@
 package com.lierlier.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lierlier.backend.mapper.UserMapper;
 import com.lierlier.backend.pojo.User;
 import com.lierlier.backend.service.UserService;
@@ -147,7 +149,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, Object> getUserList(Map<String, Object> queryUser) {
+    public Map<String, Object> getUserList(Map<String, Object> queryUser, Integer page, Integer pageSize) {
         HashMap<String, Object> map = new HashMap<>();
         User user;
         try {
@@ -176,7 +178,15 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isNotEmpty(sex)) queryWrapper.eq("sex", sex);
         if (StringUtils.isNotEmpty(status)) queryWrapper.eq("status", Integer.parseInt(status));
 
-        List<User> users = userMapper.selectList(queryWrapper);
+        List<User> users;
+        if (page != null && pageSize != null) {
+            IPage<User> userIPage = new Page<>(page, pageSize);
+            users = userMapper.selectPage(userIPage, queryWrapper).getRecords();
+            map.put("total", userMapper.selectCount(queryWrapper));
+        } else {
+            users = userMapper.selectList(queryWrapper);
+        }
+
         for (User u: users) {
             u.setPassword("");
         }

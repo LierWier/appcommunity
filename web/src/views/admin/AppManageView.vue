@@ -26,11 +26,11 @@
   <div>
     <el-button-group>
       <el-button type="primary" plain @click="addAppDialogVisible = true">添加</el-button>
-      <el-button type="danger" plain>删除</el-button>
+      <el-button type="danger" plain @click="deleteApp">删除</el-button>
     </el-button-group>
-    <el-button-group>
-      <el-button type="primary" plain>上架</el-button>
-      <el-button type="danger" plain>下架</el-button>
+    <el-button-group class="ml-4">
+      <el-button type="primary" plain @click="changeShelf(true)">上架</el-button>
+      <el-button type="danger" plain @click="changeShelf(false)">下架</el-button>
     </el-button-group>
   </div>
   <el-table
@@ -72,6 +72,7 @@ const selection = ref([])
 
 const handleSelectionChange = (val) => {
   selection.value = val
+  // AjaxUtils.text()
 }
 
 const getAppList = () => {
@@ -80,7 +81,6 @@ const getAppList = () => {
     else ElMessage.error(resp.msg)
   })
 }
-getAppList()
 
 const getAppCategory = () => {
   AjaxUtils.getAppCategory().then(resp => {
@@ -88,9 +88,34 @@ const getAppCategory = () => {
     else ElMessage.error("拉取应用分类错误:" + resp.msg);
   }).catch(() => ElMessage.error("拉取应用分类错误！"))
 }
-getAppCategory()
+
+const pageInit = () => {
+  getAppList();
+  getAppCategory();
+}
+pageInit();
+
+const changeShelf = (v) => {
+  const ids = []
+  if (selection.value.length > 0) {
+    for (const i of selection.value) ids.push(i["id"])
+    AjaxUtils.updateAppStatus({ids, status: v ? 1 : 0}).then(resp => {
+      if (resp.msg === "success") ElMessage.success("状态更新成功！")
+      pageInit();
+    })
+  } else ElMessage.info("请选择至少1条数据！");
+}
+
+const deleteApp = () => {
+  const ids = []
+  if (selection.value.length > 0) {
+    for (const i of selection.value) ids.push(i["id"])
+  } else ElMessage.info("请选择至少1条数据！");
+}
 </script>
 
 <style scoped>
-
+.ml-4 {
+  margin-left: 1.5rem;
+}
 </style>
