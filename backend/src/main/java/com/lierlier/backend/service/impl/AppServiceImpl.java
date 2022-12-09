@@ -2,13 +2,14 @@ package com.lierlier.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lierlier.backend.mapper.AppMapper;
 import com.lierlier.backend.pojo.App;
 import com.lierlier.backend.service.AppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
 
@@ -19,7 +20,8 @@ public class AppServiceImpl implements AppService {
 
     @Override
     public Map<String, Object> getAppList(Map<String, Object> queryApp) {
-        HashMap<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
 
         QueryWrapper<App> queryWrapper = new QueryWrapper<>();
         queryWrapper.ge("status", 0);  // 过滤已删除
@@ -27,10 +29,21 @@ public class AppServiceImpl implements AppService {
         if (StringUtils.isNotEmpty((String) queryApp.get("author"))) queryWrapper.like("author", queryApp.get("author"));
         if (StringUtils.isNotEmpty((String) queryApp.get("category"))) queryWrapper.like("category", queryApp.get("category"));
         if (StringUtils.isNotEmpty((String) queryApp.get("status"))) queryWrapper.eq("status", queryApp.get("status"));
-        List<App> apps = appMapper.selectList(queryWrapper);
 
+        List<App> apps;
+
+        if (queryApp.get("page") != null && queryApp.get("pageSize") != null) {
+            String page = queryApp.get("page").toString();
+            String pageSize = queryApp.get("pageSize").toString();
+            IPage<App> appIPage = new Page<>(Integer.parseInt(page), Integer.parseInt(pageSize));
+            apps = appMapper.selectPage(appIPage, queryWrapper).getRecords();
+            data.put("total", appMapper.selectCount(queryWrapper));
+        } else {
+            apps = appMapper.selectList(queryWrapper);
+        }
+        data.put("apps", apps);
         map.put("msg", "success");
-        map.put("data", apps);
+        map.put("data", data);
         return map;
     }
 

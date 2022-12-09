@@ -149,7 +149,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, Object> getUserList(Map<String, Object> queryUser, Integer page, Integer pageSize) {
+    public Map<String, Object> getUserList(Map<String, Object> queryUser) {
         HashMap<String, Object> map = new HashMap<>();
         User user;
         try {
@@ -179,17 +179,19 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isNotEmpty(status)) queryWrapper.eq("status", Integer.parseInt(status));
 
         List<User> users;
-        if (page != null && pageSize != null) {
-            IPage<User> userIPage = new Page<>(page, pageSize);
+
+        if (queryUser.get("page") != null && queryUser.get("pageSize") != null) {
+            String page = queryUser.get("page").toString();
+            String pageSize = queryUser.get("pageSize").toString();
+            IPage<User> userIPage = new Page<>(Integer.parseInt(page), Integer.parseInt(pageSize));
             users = userMapper.selectPage(userIPage, queryWrapper).getRecords();
             map.put("total", userMapper.selectCount(queryWrapper));
         } else {
             users = userMapper.selectList(queryWrapper);
         }
 
-        for (User u: users) {
-            u.setPassword("");
-        }
+        for (User u: users) u.setPassword(null);
+
         map.put("msg", "success");
         map.put("users", users);
         return map;

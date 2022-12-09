@@ -29,11 +29,8 @@ public class UserController {
     }
 
     @GetMapping("/getuserlist")
-    public Map<String, Object> getUserList(@RequestParam Map<String, Object> queryUser, Integer page, Integer pageSize) {
-        System.out.println(queryUser);
-        System.out.println(page);
-        System.out.println(pageSize);
-        return userService.getUserList(queryUser, page, pageSize);
+    public Map<String, Object> getUserList(@RequestParam Map<String, Object> queryUser) {
+        return userService.getUserList(queryUser);
     }
 
     @PostMapping("/updateStatus")

@@ -23,16 +23,30 @@
       <el-button type="primary" @click="getAppList">查询</el-button>
     </el-form-item>
   </el-form>
-  <div>
-    <el-button-group>
-      <el-button type="primary" plain @click="addAppDialogVisible = true">添加</el-button>
-      <el-button type="danger" plain @click="deleteApp">删除</el-button>
-    </el-button-group>
-    <el-button-group class="ml-4">
-      <el-button type="primary" plain @click="changeShelf(true)">上架</el-button>
-      <el-button type="danger" plain @click="changeShelf(false)">下架</el-button>
-    </el-button-group>
-  </div>
+  <el-row style="margin-bottom: 10px">
+    <el-col :span="12">
+      <el-button-group>
+        <el-button type="primary" plain @click="appDialogVisible = true">添加</el-button>
+        <el-button type="danger" plain @click="deleteApp">删除</el-button>
+      </el-button-group>
+      <el-button-group class="ml-4">
+        <el-button type="primary" plain @click="changeShelf(true)">上架</el-button>
+        <el-button type="danger" plain @click="changeShelf(false)">下架</el-button>
+      </el-button-group>
+    </el-col>
+    <el-col :span="12">
+      <el-pagination
+          v-model:current-page="page"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 50, 100, 200]"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="dataTotal"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          style="float: right"
+      />
+    </el-col>
+  </el-row>
   <el-table
       :data="tableData"
       border style="width: 100%"
@@ -52,11 +66,57 @@
     <el-table-column prop="updatePostTime" label="上次更新" align="center" sortable width="120"/>
     <el-table-column fixed="right" prop="status" label="状态" align="center" sortable :formatter="(_,__,cell) => formatterUtils.appStatusFmt(cell)" />
     <el-table-column fixed="right" label="操作" align="center" >
-      <template #default>
-        <el-button link type="primary">修改</el-button>
+      <template #default="scope">
+        <el-button link type="primary" @click="updateApp(scope.row)">修改</el-button>
       </template>
     </el-table-column>
   </el-table>
+
+  <el-dialog v-model="appDialogVisible" title="应用信息" @close="appFormRef.resetFields()">
+    <el-form :model="appForm" ref="appFormRef" :rules="rules">
+      <el-form-item label="应用名称" :label-width="formLabelWidth" prop="appName">
+        <el-input v-model.trim="appForm.appName" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="开发者" :label-width="formLabelWidth" prop="author">
+        <el-input v-model.trim="appForm.author" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="描述" :label-width="formLabelWidth" prop="description">
+        <el-input v-model.trim="appForm.description" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="类别" :label-width="formLabelWidth" prop="category">
+        <el-input v-model.trim="appForm.category" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="下载量" :label-width="formLabelWidth" prop="downloads">
+        <el-input v-model="appForm.downloads" autocomplete="off" type="number"/>
+      </el-form-item>
+      <el-form-item label="发布日期" :label-width="formLabelWidth" prop="postTime">
+        <el-date-picker
+            v-model="appForm.postTime"
+            type="date"
+            placeholder="未选择"
+            :disabled-date="disabledDate"
+            :shortcuts="shortcuts"
+        />
+      </el-form-item>
+      <el-form-item label="上次更新" :label-width="formLabelWidth" prop="updatePostTime">
+        <el-date-picker
+            v-model="appForm.updatePostTime"
+            type="date"
+            placeholder="未选择"
+            :disabled-date="disabledDate"
+            :shortcuts="shortcuts"
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="appDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submit(appFormRef)">
+          确认
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
@@ -70,15 +130,67 @@ const queryApp = reactive({appName: "", author: "", category: "", status: ""})
 const category = ref([])
 const selection = ref([])
 
-const handleSelectionChange = (val) => {
-  selection.value = val
-  // AjaxUtils.text()
+const handleSelectionChange = (val) => selection.value = val
+// 分页配置
+const page = ref(1)  // 当前页
+const pageSize = ref(20)  // 分页大小
+const dataTotal = ref(0)  // 数据条数
+const handleCurrentChange = () => getAppList();
+const handleSizeChange = () => {
+  page.value = 1
+  getAppList()
+}
+// 弹框配置
+const appDialogVisible = ref(false)
+const formLabelWidth = ref("180px")
+const appFormRef = ref({})
+const appForm = reactive({id: null, appName: null, description: null, author: null, category: null, downloads: null, postTime: null, updatePostTime: null})
+const shortcuts = [
+  {
+    text: '今天',
+    value: new Date(),
+  },
+  {
+    text: '昨天',
+    value: () => {
+      const date = new Date()
+      date.setTime(date.getTime() - 3600 * 1000 * 24)
+      return date
+    },
+  },
+  {
+    text: '一周前',
+    value: () => {
+      const date = new Date()
+      date.setTime(date.getTime() - 3600 * 1000 * 24 * 7)
+      return date
+    },
+  },
+]
+const disabledDate = (time) => {
+  return time.getTime() > Date.now()
+}
+const rules = reactive({
+  appName: [
+    { required: true, message: '应用名称不能为空', trigger: 'blur' },
+  ]
+})
+const submit = (formRef) => {
+  formRef.validate(valid => {
+    console.log(valid)
+  })
 }
 
 const getAppList = () => {
-  AjaxUtils.getAppList(queryApp).then((resp) => {
-    if (resp.msg === "success") tableData.value = resp.data
-    else ElMessage.error(resp.msg)
+  AjaxUtils.getAppList({
+    ...queryApp,
+    page: page.value,
+    pageSize: pageSize.value
+  }).then((resp) => {
+    if (resp.msg === "success") {
+      tableData.value = resp.data.apps
+      dataTotal.value = resp.data.total
+    } else ElMessage.error(resp.msg)
   })
 }
 
@@ -112,10 +224,18 @@ const deleteApp = () => {
     for (const i of selection.value) ids.push(i["id"])
   } else ElMessage.info("请选择至少1条数据！");
 }
+
+const updateApp = (row) => {
+  appDialogVisible.value = true
+  for (const item in appForm) appForm[item] = row[item]
+}
 </script>
 
 <style scoped>
 .ml-4 {
   margin-left: 1.5rem;
+}
+.el-input {
+  width: 300px;
 }
 </style>

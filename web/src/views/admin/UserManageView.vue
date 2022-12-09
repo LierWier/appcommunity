@@ -1,4 +1,5 @@
 <template>
+  <el-config-provider :locale="locale" />
   <el-form :inline="true" :model="queryUser" class="demo-form-inline">
     <el-form-item label="用户名">
       <el-input v-model="queryUser.username" clearable style="width: 150px;"/>
@@ -33,9 +34,9 @@
       <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
-          :page-sizes="[20, 50, 100, 200]"
+          :page-sizes="[10, 20, 50, 100, 200]"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="tableData.length"
+          :total="dataTotal"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           style="float: right"
@@ -109,20 +110,25 @@
 <script setup>
 import {AjaxUtils} from "@/assets/utils/ajaxUtils";
 import {ElMessage} from "element-plus";
-import {ref, reactive} from "vue";
+import {ref, reactive, computed} from "vue";
 import formatterUtils from "@/assets/utils/formatterUtils";
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 
 let tableData = ref([])  // 表格数据
 const queryUser = reactive({username: "", tel: "", sex: "", status: ""})  // 查询参数
 // 分页配置
 const currentPage = ref(1)  // 当前页
 const pageSize = ref(20)  // 分页大小
-const handleSizeChange = (val) => {
-  console.log(`${val} items per page`)
+const dataTotal = ref(0)  // 数据条数
+const handleSizeChange = () => {
+  currentPage.value = 1
+  getUserList()
 }
-const handleCurrentChange = (val) => {
-  console.log(`current page: ${val}`)
+const handleCurrentChange = () => {
+  getUserList()
 }
+// 语言配置
+const locale = computed(() => zhCn)
 // 添加用户配置
 const addUserDialogVisible = ref(false)  // 添加用户对话框显示
 const formLabelWidth = "180px"  // 标签宽度
@@ -130,11 +136,11 @@ const addUserForm = reactive({username: "", password: "", isManager: null, tel: 
 const addUserFormRef = ref({})
 const shortcuts = [
   {
-    text: 'Today',
+    text: '今天',
     value: new Date(),
   },
   {
-    text: 'Yesterday',
+    text: '昨天',
     value: () => {
       const date = new Date()
       date.setTime(date.getTime() - 3600 * 1000 * 24)
@@ -142,7 +148,7 @@ const shortcuts = [
     },
   },
   {
-    text: 'A week ago',
+    text: '一周前',
     value: () => {
       const date = new Date()
       date.setTime(date.getTime() - 3600 * 1000 * 24 * 7)
@@ -166,11 +172,14 @@ const rules = reactive({
 
 const getUserList = () => {
   AjaxUtils.getUserList({
-    queryUser,
+    ...queryUser,
     page: currentPage.value,
     pageSize: pageSize.value
   }).then((resp) => {
-    if (resp.msg === "success") tableData.value = resp.users
+    if (resp.msg === "success") {
+      tableData.value = resp.users
+      dataTotal.value = resp.total
+    }
     else ElMessage.error(resp.msg)
   })
 }
