@@ -71,10 +71,10 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
-    public Map<String, Object> deleteAppByList(List<Integer> ids) {
+    public Map<String, Object> deleteAppByList(Integer[] ids) {
         HashMap<String, Object> map = new HashMap<>();
         try {
-            appMapper.deleteBatchIds(ids);
+            appMapper.deleteBatchIds(Arrays.asList(ids));
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -86,6 +86,10 @@ public class AppServiceImpl implements AppService {
     @Override
     public Map<String, Object> updateApp(App app) {
         HashMap<String, Object> map = new HashMap<>();
+        if (app.getId() == null) {
+            map.put("msg", "ID错误，找不到数据！");
+            return map;
+        }
         String msg = commonValid(app);
         map.put("msg", msg);
         if (!"success".equals(msg)) return map;
@@ -117,10 +121,12 @@ public class AppServiceImpl implements AppService {
 
     private String commonValid(App app) {
         if (StringUtils.isEmpty(app.getAppName())) return "应用名称不能为空！";
+        if (app.getPostTime() == null) return "发布时间不能为空！";
+        if (app.getUpdatePostTime() == null) return "更新时间不能为空！";
         QueryWrapper<App> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("app_name", app.getAppName());
+        queryWrapper.eq("app_name", app.getAppName()).ne("id", app.getId());
         List<App> apps = appMapper.selectList(queryWrapper);
-        if (!apps.isEmpty() && !Objects.equals(app.getId(), apps.get(0).getId())) return "应用名称已存在！";
+        if (!apps.isEmpty()) return "应用名称已存在！";
         return "success";
     }
 }

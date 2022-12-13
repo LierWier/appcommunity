@@ -5,6 +5,7 @@ import com.lierlier.backend.service.AppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public class AppController {
     }
 
     @PostMapping("/deletebylist")
-    public Map<String, Object> deleteAppByList(List<Integer> ids) {
+    public Map<String, Object> deleteAppByList(@RequestParam("ids[]") Integer[] ids) {
         return appService.deleteAppByList(ids);
     }
 

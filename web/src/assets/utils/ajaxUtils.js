@@ -14,8 +14,10 @@ const addUserUrl = cutUrl + `/user/add`;
 
 const getAppListUrl = cutUrl + `/app/getapplist`;
 const getAppCategoryUrl = cutUrl + `/app/getappcategory`;
-// const updateAppUrl = cutUrl + `/app/update`;
 const updateAppStatusUrl = cutUrl + `/app/updatestatusbylist`;
+const addAppUrl = cutUrl + `/app/add`;
+const updateAppUrl = cutUrl + `/app/update`;
+const deleteAppByListUrl = cutUrl + `/app/deletebylist`;
 
 export const AjaxUtils = {
     login: async (data) => {
@@ -102,13 +104,21 @@ export const AjaxUtils = {
         return fetch(getAppCategoryUrl).then(res => { return res.json() })
     },
 
-    // updateApp: (data) => {
-    //
-    // },
-
     async updateAppStatus(data) {
         return await $.post(updateAppStatusUrl, data)
     },
+
+    async addApp(data) {
+        return await $.post(addAppUrl, data)
+    },
+
+    async updateApp(data) {
+        return await $.post(updateAppUrl, data)
+    },
+
+    async deleteAppByList(data) {
+        return await $.post(deleteAppByListUrl, data)
+    }
 
     // text() {
     //     const json = []

@@ -5,8 +5,6 @@
         <el-menu
             default-active="1"
             class="el-menu-vertical-demo"
-            @open="handleOpen"
-            @close="handleClose"
             :router="true"
         >
           <el-menu-item index="1" :route="{name: 'user_manage'}">
@@ -28,25 +26,28 @@
         </el-menu>
       </el-aside>
       <el-main>
-        <router-view />
+        <router-view v-slot="{ Component }">
+          <transition mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
       </el-main>
     </el-container>
   </div>
 </template>
 
 <script setup>
-import {
-  Menu as IconMenu,
-  Setting,
-} from '@element-plus/icons-vue'
-const handleOpen = (key, keyPath) => {
-  console.log(key, keyPath)
-}
-const handleClose = (key, keyPath) => {
-  console.log(key, keyPath)
-}
+import {Menu as IconMenu} from '@element-plus/icons-vue'
 </script>
 
 <style scoped>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.2s ease;
+}
 
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
 </style>
