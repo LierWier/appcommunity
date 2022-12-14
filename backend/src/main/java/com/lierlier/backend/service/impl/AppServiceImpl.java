@@ -19,6 +19,15 @@ public class AppServiceImpl implements AppService {
     private AppMapper appMapper;
 
     @Override
+    public Map<String, Object> getInfo(Integer id) {
+        Map<String, Object> map = new HashMap<>();
+        App app = appMapper.selectById(id);
+        map.put("msg", "success");
+        map.put("data", app);
+        return map;
+    }
+
+    @Override
     public Map<String, Object> getAppList(Map<String, Object> queryApp) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> data = new HashMap<>();

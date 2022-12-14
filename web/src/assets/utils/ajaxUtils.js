@@ -13,6 +13,7 @@ const updateUserStatusUrl = cutUrl + `/user/updateStatus`;
 const addUserUrl = cutUrl + `/user/add`;
 
 const getAppListUrl = cutUrl + `/app/getapplist`;
+const getAppInfoUrl = cutUrl + `/app/getinfo`;
 const getAppCategoryUrl = cutUrl + `/app/getappcategory`;
 const updateAppStatusUrl = cutUrl + `/app/updatestatusbylist`;
 const addAppUrl = cutUrl + `/app/add`;
@@ -90,6 +91,10 @@ export const AjaxUtils = {
             resp = res;
         })
         return resp;
+    },
+
+    async getAppInfo(data) {
+        return await $.get(getAppInfoUrl, data)
     },
 
     getAppList: async (data) => {

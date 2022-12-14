@@ -1,7 +1,7 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-header>
+      <el-header class="has-sidebar">
         <nav-bar />
       </el-header>
       <el-main>

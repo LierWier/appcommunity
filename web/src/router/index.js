@@ -3,6 +3,7 @@ import HomeView from '../views/home/HomeView.vue'
 import SquareView from '../views/square/SquareView.vue'
 import RankView from '../views/rank/RankView.vue'
 import AppView from '../views/app/AppView.vue'
+import AppContentView from '../views/app/AppContentView.vue'
 import AdminView from '../views/admin/AdminView.vue'
 import UserManageView from '../views/admin/UserManageView.vue'
 import BlogManageView from '../views/admin/BlogManageView.vue'
@@ -22,6 +23,7 @@ const routes = [
     {path: '/square', name: 'square', component: SquareView, meta: {title: "AppHub - square"}},
     {path: '/rank', name: 'rank', component: RankView, meta: {title: "AppHub - rank"}},
     {path: '/app', name: 'app', component: AppView, meta: {title: "AppHub - app"}},
+    {path: '/app/:id', name: 'app_content', component: AppContentView, meta: {title: "AppHub - app"}},
     {path: '/user', name: 'user', component: UserView, meta: {title: "AppHub - user"}},
     {
         path: '/admin', name: 'admin', component: AdminView, redirect: '/admin/usermanage', children: [
@@ -34,7 +36,8 @@ const routes = [
     {path: '/login', name: 'login', component: LoginView},
     {path: '/register', name: 'register', component: RegisterView},
     {path: '/404', name: '404', component: NotFoundView},
-    {path: '/text', name: 'text', component: TextView}
+    {path: '/text', name: 'text', component: TextView},
+    {path: '/:catchAll(.*)', redirect: '/404'}
 ]
 
 const router = createRouter({

@@ -22,6 +22,7 @@ public class App {
     private String description;
     private String author;
     private String category;
+    private String content;
     private Float score;
     private Integer downloads;
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")

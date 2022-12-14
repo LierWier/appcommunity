@@ -15,6 +15,11 @@ public class AppController {
     @Autowired
     private AppService appService;
 
+    @GetMapping("/getinfo")
+    public Map<String, Object> getInfo(Integer id) {
+        return appService.getInfo(id);
+    }
+
     @GetMapping("/getapplist")
     public Map<String, Object> getAppList(@RequestParam Map<String, Object> queryApp) {
         return appService.getAppList(queryApp);

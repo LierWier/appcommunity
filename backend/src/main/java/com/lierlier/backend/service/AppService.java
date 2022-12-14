@@ -5,6 +5,7 @@ import com.lierlier.backend.pojo.App;
 import java.util.Map;
 
 public interface AppService {
+    Map<String, Object> getInfo(Integer id);
     Map<String, Object> getAppList(Map<String, Object> queryApp);
     Map<String, Object> getAppCategory();
     Map<String, Object> addApp(App app);
