@@ -13,9 +13,9 @@
         <div class="flex items-center text-sm">
           <el-radio-group @change="getAppList" v-model="queryForm.order" class="index-radio">
             <el-radio label="">全部</el-radio>
-            <el-radio label="1">下载最多</el-radio>
-            <el-radio label="2">评分最高</el-radio>
-            <el-radio label="3">最新发布</el-radio>
+            <el-radio label="downloads">下载最多</el-radio>
+            <el-radio label="score">评分最高</el-radio>
+            <el-radio label="post_time">最新发布</el-radio>
           </el-radio-group>
         </div>
       </el-form-item>
@@ -35,12 +35,18 @@
             <el-col :span="18">
               <div style="padding: 10px">
                 <span>{{ app.appName }}</span>
-                <span
-                    class="app_rate"
-                    :class="app.score>=4 && 'fc-primary' || app.score>=3 && 'fc-warning' || 'fc-danger'"
-                >
-                  {{ app.score }}
-                </span>
+                <div class="app_evl">
+                  <span class="description">
+                    {{ formatterUtils.appDownloadsFmt(app.downloads) }} 次
+                    <el-icon><Bottom /></el-icon>
+                  </span>
+                  <span
+                      style="margin-left: 15px"
+                      :class="app.score>=4 && 'fc-primary' || app.score>=3 && 'fc-warning' || 'fc-danger'"
+                  >
+                    {{ app.score }}
+                  </span>
+                </div>
                 <div class="bottom">
                   <time class="description">{{ app.description }}</time>
                   <el-button text class="button" @click="$router.push({name: 'app_content', params: {id: app.id}})">查看</el-button>
@@ -58,6 +64,7 @@
 import {AjaxUtils} from "@/assets/utils/ajaxUtils";
 import {ElMessage} from "element-plus";
 import {reactive, ref} from "vue";
+import formatterUtils from "@/assets/utils/formatterUtils";
 
 const appList = ref([])
 const queryForm = reactive({appName: "", category: "", order: ""})
@@ -99,7 +106,8 @@ getAppCategory()
 .el-card {
   border-radius: 20px;
 }
-.app_rate {
+.app_evl {
+  /*font-size: 14px;*/
   float: right;
 }
 .fc-primary {

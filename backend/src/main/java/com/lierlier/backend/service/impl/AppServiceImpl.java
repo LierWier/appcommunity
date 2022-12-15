@@ -39,6 +39,8 @@ public class AppServiceImpl implements AppService {
         if (StringUtils.isNotEmpty((String) queryApp.get("category"))) queryWrapper.like("category", queryApp.get("category"));
         if (StringUtils.isNotEmpty((String) queryApp.get("status"))) queryWrapper.eq("status", queryApp.get("status"));
 
+        if (StringUtils.isNotEmpty((String) queryApp.get("order"))) queryWrapper.orderByDesc((String) queryApp.get("order"));
+
         List<App> apps;
 
         if (queryApp.get("page") != null && queryApp.get("pageSize") != null) {

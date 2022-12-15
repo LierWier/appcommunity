@@ -5,6 +5,7 @@ const ip = `127.0.0.1`;
 const port = 3001;
 const cutUrl = `http://${ip}:${port}/api`
 
+// user
 const getTokenUrl = cutUrl + `/user/gettoken`;
 const registerUrl = cutUrl + `/user/register`;
 const getInfoUrl = cutUrl + `/user/getinfo`;
@@ -12,6 +13,7 @@ const getUserListUrl = cutUrl + `/user/getuserlist`;
 const updateUserStatusUrl = cutUrl + `/user/updateStatus`;
 const addUserUrl = cutUrl + `/user/add`;
 
+// app
 const getAppListUrl = cutUrl + `/app/getapplist`;
 const getAppInfoUrl = cutUrl + `/app/getinfo`;
 const getAppCategoryUrl = cutUrl + `/app/getappcategory`;
@@ -19,6 +21,10 @@ const updateAppStatusUrl = cutUrl + `/app/updatestatusbylist`;
 const addAppUrl = cutUrl + `/app/add`;
 const updateAppUrl = cutUrl + `/app/update`;
 const deleteAppByListUrl = cutUrl + `/app/deletebylist`;
+
+// appEvl
+const appEvlShortUrl = cutUrl + `/appevl`;
+const getAppEvlListUrl = appEvlShortUrl + `/getlist`;
 
 export const AjaxUtils = {
     login: async (data) => {
@@ -123,6 +129,10 @@ export const AjaxUtils = {
 
     async deleteAppByList(data) {
         return await $.post(deleteAppByListUrl, data)
+    },
+
+    async getAppEvlList(data) {
+        return await $.get(getAppEvlListUrl, data)
     }
 
     // text() {
