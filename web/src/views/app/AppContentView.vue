@@ -8,7 +8,7 @@
     <el-divider />
     <div style="height: 130px">
       <div class="app_info">
-        <el-image style="width: 130px; height: 130px" :src="require(`@/assets/images/app_icon/${app.appName}.png`)" fit="fill" />
+        <el-image style="width: 130px; height: 130px" :src="app.appIcon" fit="fill" />
       </div>
       <div class="app_info">
         <h1 class="app_info_name">{{ app.appName }}</h1>
@@ -54,7 +54,59 @@
       </div>
       <el-divider />
       <div>
-        <el-card v-for="item in appEvls" :key="item.id" class="evl-card" shadow="hover" style="margin: 20px 0px">
+        <el-card v-if="!loginUser.is_login" class="evl-card" style="margin: 20px 0">
+          <template #header>
+            <div class="card-header">
+              <span>我的评论</span>
+            </div>
+          </template>
+          尚未登陆
+        </el-card>
+        <el-card v-else-if="myEvl" class="evl-card my-evl" style="margin: 20px 0">
+          <template #header>
+            <div class="card-header">
+              <span>我的评论</span>
+              <el-popconfirm title="确认删除吗?" @confirm="deleteAppEvl">
+                <template #reference>
+                  <el-button class="button" text>删除</el-button>
+                </template>
+              </el-popconfirm>
+            </div>
+          </template>
+          <div class="evl-box" style="display: flex">
+            <div class="evl-box-left" style="width: 50px">
+              <el-avatar :size="50" src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png" />
+              <el-button style="width: 50px; margin-top: 10px;" :icon="Star" round>赞</el-button>
+            </div>
+            <div class="evl-box-right" style="margin-left: 20px">
+              <el-rate
+                  v-model="myEvl.score"
+                  disabled
+                  size="small"
+              />
+              <div>{{ loginUser.info.username }}</div>
+              <div class="description" style="font-size: 12px">{{ myEvl.createTime }}</div>
+              <div>{{ myEvl.content }}</div>
+            </div>
+          </div>
+        </el-card>
+        <el-card v-else class="evl-card" style="margin: 20px 0">
+          <template #header>
+            <div class="card-header">
+              <span>我的评论</span>
+              <el-button class="button" text @click="onSubmit">发布</el-button>
+            </div>
+          </template>
+          <el-form :model="form" label-width="120px" label-position="top">
+            <el-form-item label="评分">
+              <el-rate v-model="form.score" />
+            </el-form-item>
+            <el-form-item label="评语">
+              <el-input v-model="form.content" type="textarea" />
+            </el-form-item>
+          </el-form>
+        </el-card>
+        <el-card v-for="item in appEvls" :key="item.id" class="evl-card" shadow="hover" style="margin: 20px 0">
           <div class="evl-box" style="display: flex">
             <div class="evl-box-left" style="width: 50px">
               <el-avatar :size="50" src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png" />
@@ -96,10 +148,14 @@ import {AjaxUtils} from "@/assets/utils/ajaxUtils";
 import {ElMessage} from "element-plus";
 import router from "@/router";
 import {Star} from '@element-plus/icons-vue'
+import store from "@/store";
 
 const route = useRoute()
 const app = ref({appName: "微信"})
 const appEvls = ref([])
+const myEvl = ref(null)
+const form = reactive({score: 5, content: ""})
+const loginUser = store.state.user
 const data = reactive({
   page: 1,
   pageSize: 10,
@@ -127,7 +183,41 @@ const getAppEvlList = () => {
     } else ElMessage.error("获取评论失败！")
   }).catch(() => ElMessage.error("获取评论失败！"))
 }
-getAppEvlList()
+
+const getAppEvlByLoginUser = () => {
+  if (!loginUser.is_login) return;
+  AjaxUtils.getAppEvlByLoginUser({appId: route.params.id}).then(resp => {
+    if (resp.msg === "success") myEvl.value = resp.data
+  })
+}
+const getAppEvlsInit = () => {
+  myEvl.value = null
+  getAppEvlByLoginUser()
+  getAppEvlList()
+}
+getAppEvlsInit()
+
+const onSubmit = () => {
+  const data = {...form, appId: route.params.id, userId: loginUser.info.id}
+  AjaxUtils.postAppEvl(data).then(resp => {
+    if (resp.msg !== "success") {
+      ElMessage.error("评论失败！" + resp.msg)
+      return;
+    }
+    ElMessage.success("评论成功！")
+    getAppEvlsInit()
+  })
+}
+const deleteAppEvl = () => {
+  AjaxUtils.deleteAppEvl({id: myEvl.value.id}).then(resp => {
+    if (resp.msg !== "success") {
+      ElMessage.error("删除失败！" + resp.msg)
+      return;
+    }
+    ElMessage.success("删除成功！")
+    getAppEvlsInit()
+  })
+}
 
 const rateCountFunc = (appEvls) => {
   const rateCount = {"5": 0, "4": 0, "3": 0, "2": 0, "1": 0}
@@ -200,5 +290,18 @@ pre {
 }
 .rate-bar {
   display: inline-block;
+}
+.my-evl {
+  /*border: 1px solid #409EFF;*/
+  background: #ecf5ff;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.text {
+  font-size: 14px;
 }
 </style>

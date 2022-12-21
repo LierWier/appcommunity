@@ -29,7 +29,7 @@
         <el-card shadow="hover" :body-style="{padding: '0px'}">
           <el-row>
             <el-col :span="6">
-              <img :src="require(`@/assets/images/app_icon/${app.appName}.png`) || 'https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png'"
+              <img :src="app.appIcon || 'https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png'"
                    class="image" alt="">
             </el-col>
             <el-col :span="18">

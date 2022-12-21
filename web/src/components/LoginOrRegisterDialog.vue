@@ -32,6 +32,7 @@ import {reactive, ref} from "vue";
 import {AjaxUtils} from "@/assets/utils/ajaxUtils";
 import {ElMessage, ElMessageBox} from "element-plus";
 import store from "@/store";
+import router from "@/router";
 
 const formLabelWidth = ref('150px')
 const formRef = ref({});
@@ -72,6 +73,7 @@ const login = async () => {
       store.commit("updateLogin", true)
       ElMessage.success("登录成功！")
       store.commit("updateLoginDialogVisible", false)
+      router.go(0)
     } else {
       ElMessage.warning("获取个人信息失败！")
     }
