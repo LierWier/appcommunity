@@ -7,7 +7,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lierlier.backend.mapper.AppEvaluationMapper;
+import com.lierlier.backend.mapper.AppMapper;
 import com.lierlier.backend.mapper.UserMapper;
+import com.lierlier.backend.pojo.App;
 import com.lierlier.backend.pojo.AppEvaluation;
 import com.lierlier.backend.pojo.User;
 import com.lierlier.backend.service.AppEvaluationService;
@@ -17,6 +19,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 
@@ -26,6 +30,8 @@ public class AppEvaluationServiceImpl implements AppEvaluationService {
     private AppEvaluationMapper appEvaluationMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private AppMapper appMapper;
 
     @Override
     public Map<String, Object> getAppEvlList(Integer appId, Integer page, Integer pageSize) {
@@ -108,7 +114,26 @@ public class AppEvaluationServiceImpl implements AppEvaluationService {
         appEvl.setCreateTime(new Date());
         appEvaluationMapper.insert(appEvl);
         resp.put("msg", "success");
+
+        updateAppScore(appEvl.getAppId());
+
         return resp;
+    }
+
+    private void updateAppScore(Integer appId) {
+        QueryWrapper<AppEvaluation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("app_id", appId).select("avg(score) as avg");
+        List<Map<String, Object>> maps = appEvaluationMapper.selectMaps(queryWrapper);
+        App app = new App();
+        app.setId(appId);
+        if (maps.get(0) == null) {
+            app.setScore(0f);
+        } else {
+            double avg = Double.parseDouble(maps.get(0).get("avg").toString());
+            Float score = Float.valueOf(new BigDecimal(avg).setScale(1, RoundingMode.HALF_UP).toString());
+            app.setScore(score);
+        }
+        appMapper.updateById(app);
     }
 
     @Override
@@ -136,6 +161,9 @@ public class AppEvaluationServiceImpl implements AppEvaluationService {
 
         appEvaluationMapper.deleteById(id);
         resp.put("msg", "success");
+
+        updateAppScore(appEvl.getAppId());
+
         return resp;
     }
 }

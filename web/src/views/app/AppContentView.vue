@@ -170,7 +170,6 @@ const getAppInfo = (id) => {
     else ElMessage.error("error")
   })
 }
-getAppInfo(route.params.id)
 const getAppEvlList = () => {
   AjaxUtils.getAppEvlList({
     appId: route.params.id, page: data.page, pageSize: data.pageSize
@@ -183,7 +182,6 @@ const getAppEvlList = () => {
     } else ElMessage.error("获取评论失败！")
   }).catch(() => ElMessage.error("获取评论失败！"))
 }
-
 const getAppEvlByLoginUser = () => {
   if (!loginUser.is_login) return;
   AjaxUtils.getAppEvlByLoginUser({appId: route.params.id}).then(resp => {
@@ -191,6 +189,7 @@ const getAppEvlByLoginUser = () => {
   })
 }
 const getAppEvlsInit = () => {
+  getAppInfo(route.params.id)
   myEvl.value = null
   getAppEvlByLoginUser()
   getAppEvlList()
