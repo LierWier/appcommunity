@@ -6,11 +6,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lierlier.backend.mapper.AppEvaluationLikeRecordMapper;
 import com.lierlier.backend.mapper.AppEvaluationMapper;
 import com.lierlier.backend.mapper.AppMapper;
 import com.lierlier.backend.mapper.UserMapper;
 import com.lierlier.backend.pojo.App;
 import com.lierlier.backend.pojo.AppEvaluation;
+import com.lierlier.backend.pojo.AppEvaluationLikeRecord;
 import com.lierlier.backend.pojo.User;
 import com.lierlier.backend.service.AppEvaluationService;
 import com.lierlier.backend.service.impl.utils.UserDetailsImpl;
@@ -32,12 +34,23 @@ public class AppEvaluationServiceImpl implements AppEvaluationService {
     private UserMapper userMapper;
     @Autowired
     private AppMapper appMapper;
+    @Autowired
+    private AppEvaluationLikeRecordMapper appEvaluationLikeRecordMapper;
 
     @Override
     public Map<String, Object> getAppEvlList(Integer appId, Integer page, Integer pageSize) {
         Map<String, Object> resp = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
 
+        User user;
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+            user = loginUser.getUser();
+        } catch (Exception e) {
+            user = null;
+        }
         QueryWrapper<AppEvaluation> queryWrapper = new QueryWrapper<>();
         queryWrapper.gt("status", 0).eq("app_id", appId).orderByDesc("create_time");
 
@@ -54,6 +67,12 @@ public class AppEvaluationServiceImpl implements AppEvaluationService {
         for (AppEvaluation appEvl: appEvls) {
             JSONObject newAppEvl = (JSONObject) JSON.toJSON(appEvl);
             newAppEvl.put("username", userMapper.selectById(appEvl.getUserId()).getUsername());
+            if (user != null) {
+                QueryWrapper<AppEvaluationLikeRecord> wrapper = new QueryWrapper<>();
+                wrapper.eq("app_evaluation_id", appEvl.getId()).eq("user_id", user.getId());
+                if (appEvaluationLikeRecordMapper.selectCount(wrapper) > 0) newAppEvl.put("isLiked", 1);
+                else newAppEvl.put("isLiked", 0);
+            } else newAppEvl.put("isLiked", 0);
             newData.add(JSON.parseObject(newAppEvl.toString()));
         }
 
@@ -165,5 +184,52 @@ public class AppEvaluationServiceImpl implements AppEvaluationService {
         updateAppScore(appEvl.getAppId());
 
         return resp;
+    }
+
+    @Override
+    public Map<String, Object> updateLike(Integer id) {
+        Map<String, Object> resp = new HashMap<>();
+        User user;
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+            user = loginUser.getUser();
+        } catch (Exception e) {
+            resp.put("msg", "未登录");
+            return resp;
+        }
+
+        AppEvaluation appEvaluation = appEvaluationMapper.selectById(id);
+        if (Objects.equals(appEvaluation.getUserId(), user.getId())) {
+            resp.put("msg", "不能给自己点赞");
+            return resp;
+        }
+
+        QueryWrapper<AppEvaluationLikeRecord> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("app_evaluation_id", id).eq("user_id", user.getId());
+        AppEvaluationLikeRecord record = appEvaluationLikeRecordMapper.selectOne(queryWrapper);
+        if (record == null) {
+            AppEvaluationLikeRecord newRecord = new AppEvaluationLikeRecord();
+            newRecord.setAppEvaluationId(id);
+            newRecord.setUserId(user.getId());
+            newRecord.setCreateTime(new Date());
+            appEvaluationLikeRecordMapper.insert(newRecord);
+        } else {
+            appEvaluationLikeRecordMapper.deleteById(record);
+        }
+        updateAppEvaluationLike(id);
+        resp.put("msg", "success");
+        return resp;
+    }
+
+    private void updateAppEvaluationLike(Integer id) {
+        QueryWrapper<AppEvaluationLikeRecord> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("app_evaluation_id", id);
+        Integer liked = Math.toIntExact(appEvaluationLikeRecordMapper.selectCount(queryWrapper));
+        AppEvaluation appEvaluation = new AppEvaluation();
+        appEvaluation.setId(id);
+        appEvaluation.setLiked(liked);
+        appEvaluationMapper.updateById(appEvaluation);
     }
 }

@@ -9,4 +9,5 @@ public interface AppEvaluationService {
     Map<String, Object> getAppEvlByLoginUser(Integer appId);
     Map<String, Object> postAppEvl(AppEvaluation appEvl);
     Map<String, Object> deleteAppEvlById(Integer id);
+    Map<String, Object> updateLike(Integer id);
 }

@@ -76,7 +76,7 @@
           <div class="evl-box" style="display: flex">
             <div class="evl-box-left" style="width: 50px">
               <el-avatar :size="50" src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png" />
-              <el-button style="width: 50px; margin-top: 10px;" :icon="Star" round>赞</el-button>
+              <el-button style="width: 50px; margin-top: 10px;" :icon="Star" round disabled>{{ myEvl.liked }}</el-button>
             </div>
             <div class="evl-box-right" style="margin-left: 20px">
               <el-rate
@@ -110,7 +110,7 @@
           <div class="evl-box" style="display: flex">
             <div class="evl-box-left" style="width: 50px">
               <el-avatar :size="50" src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png" />
-              <el-button style="width: 50px; margin-top: 10px;" :icon="Star" round>赞</el-button>
+              <el-button style="width: 50px; margin-top: 10px;" :icon="Star" round @click="likeAppEvl(item.id)" :type="item.isLiked == 1 && 'primary' || ''" plain>{{ item.liked }}</el-button>
             </div>
             <div class="evl-box-right" style="margin-left: 20px">
               <el-rate
@@ -176,6 +176,7 @@ const getAppEvlList = () => {
   }).then(resp => {
     if (resp.msg === "success") {
       appEvls.value = resp.data.appEvls
+      console.log(appEvls.value)
       data.total = resp.data.total
       data.rateCount = rateCountFunc(appEvls.value)
       data.ratePct = ratePctFunc(data.rateCount)
@@ -216,6 +217,13 @@ const deleteAppEvl = () => {
     ElMessage.success("删除成功！")
     getAppEvlsInit()
   })
+}
+
+const likeAppEvl = (id) => {
+  AjaxUtils.likeAppEvl({id}).then(resp => {
+    if (resp.msg === "success") getAppEvlsInit()
+    else ElMessage.error("操作失败！" + resp.msg)
+  }).catch(() => ElMessage.error("操作失败！"))
 }
 
 const rateCountFunc = (appEvls) => {

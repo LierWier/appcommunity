@@ -28,6 +28,7 @@ const getAppEvlListUrl = appEvlShortUrl + `/getlist`;
 const getAppEvlByLoginUserUrl = appEvlShortUrl + `/getbyloginuser`
 const postAppEvlUrl = appEvlShortUrl + `/post`
 const deleteAppEvlUrl = appEvlShortUrl + `/delete`
+const likeAppEvlUrl = appEvlShortUrl + `/like`
 
 export const AjaxUtils = {
     login: async (data) => {
@@ -135,7 +136,14 @@ export const AjaxUtils = {
     },
 
     async getAppEvlList(data) {
-        return await $.get(getAppEvlListUrl, data)
+        return await $.ajax({
+            url: getAppEvlListUrl,
+            data: data,
+            type: "get",
+            headers: {
+                Authorization: "Bearer " + store.state.user.token
+            }
+        })
     },
 
     async getAppEvlByLoginUser(data) {
@@ -156,6 +164,17 @@ export const AjaxUtils = {
     async deleteAppEvl(data) {
         return await $.ajax({
             url: deleteAppEvlUrl,
+            data: data,
+            type: "post",
+            headers: {
+                Authorization: "Bearer " + store.state.user.token
+            }
+        })
+    },
+
+    async likeAppEvl(data) {
+        return await $.ajax({
+            url: likeAppEvlUrl,
             data: data,
             type: "post",
             headers: {

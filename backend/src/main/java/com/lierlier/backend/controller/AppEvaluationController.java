@@ -35,4 +35,9 @@ public class AppEvaluationController {
     public Map<String, Object> deleteAppEvlById(Integer id) {
         return appEvaluationService.deleteAppEvlById(id);
     }
+
+    @PostMapping("/like")
+    public Map<String, Object> updateLike(Integer id) {
+        return appEvaluationService.updateLike(id);
+    }
 }
