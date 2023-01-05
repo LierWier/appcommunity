@@ -2,18 +2,16 @@ package com.lierlier.backend.controller;
 
 import com.lierlier.backend.pojo.App;
 import com.lierlier.backend.service.AppService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/app")
+@RequiredArgsConstructor
 public class AppController {
-    @Autowired
-    private AppService appService;
+    private final AppService appService;
 
     @GetMapping("/getinfo")
     public Map<String, Object> getInfo(Integer id) {

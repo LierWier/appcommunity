@@ -2,7 +2,7 @@ package com.lierlier.backend.controller;
 
 import com.lierlier.backend.pojo.AppEvaluation;
 import com.lierlier.backend.service.AppEvaluationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,9 +12,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/appevl")
+@RequiredArgsConstructor
 public class AppEvaluationController {
-    @Autowired
-    private AppEvaluationService appEvaluationService;
+    private final AppEvaluationService appEvaluationService;
 
     @GetMapping("/getlist")
     public Map<String, Object> getAppEvlList(Integer appId, Integer page, Integer pageSize) {
@@ -41,3 +41,4 @@ public class AppEvaluationController {
         return appEvaluationService.updateLike(id);
     }
 }
+

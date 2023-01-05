@@ -8,15 +8,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lierlier.backend.mapper.AppMapper;
 import com.lierlier.backend.pojo.App;
 import com.lierlier.backend.service.AppService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class AppServiceImpl implements AppService {
-    @Autowired
-    private AppMapper appMapper;
+    private final AppMapper appMapper;
 
     @Override
     public Map<String, Object> getInfo(Integer id) {

@@ -2,16 +2,16 @@ package com.lierlier.backend.controller;
 
 import com.lierlier.backend.pojo.User;
 import com.lierlier.backend.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @PostMapping("/gettoken")
     public Map<String, Object> getToken(String username, String password) {

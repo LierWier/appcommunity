@@ -16,7 +16,7 @@ import com.lierlier.backend.pojo.AppEvaluationLikeRecord;
 import com.lierlier.backend.pojo.User;
 import com.lierlier.backend.service.AppEvaluationService;
 import com.lierlier.backend.service.impl.utils.UserDetailsImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -27,15 +27,12 @@ import java.util.*;
 
 
 @Service
+@RequiredArgsConstructor
 public class AppEvaluationServiceImpl implements AppEvaluationService {
-    @Autowired
-    private AppEvaluationMapper appEvaluationMapper;
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private AppMapper appMapper;
-    @Autowired
-    private AppEvaluationLikeRecordMapper appEvaluationLikeRecordMapper;
+    private final AppEvaluationMapper appEvaluationMapper;
+    private final UserMapper userMapper;
+    private final AppMapper appMapper;
+    private final AppEvaluationLikeRecordMapper appEvaluationLikeRecordMapper;
 
     @Override
     public Map<String, Object> getAppEvlList(Integer appId, Integer page, Integer pageSize) {
