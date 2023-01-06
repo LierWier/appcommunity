@@ -222,6 +222,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Map<String, Object> resetPassword(Integer id) {
+        Map<String, Object> resp = new HashMap<>();
+
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+            User user = loginUser.getUser();
+            if (user.getIsManager() < 1) {
+                resp.put("msg", "无权限");
+                return resp;
+            }
+        } catch (Exception e) {
+            resp.put("msg", "登录异常！");
+            return resp;
+        }
+
+        User user = userMapper.selectById(id);
+        user.setPassword(passwordEncoder.encode(user.getUsername()));
+        userMapper.updateById(user);
+        resp.put("msg", "success");
+        resp.put("data", user.getUsername());
+        return resp;
+    }
+
+    @Override
     public Map<String, Object> addUser(User user) {
         HashMap<String, Object> map = new HashMap<>();
         String msg = commonValid(user);

@@ -38,6 +38,11 @@ public class UserController {
         return userService.updateStatus(id, status);
     }
 
+    @PostMapping("/resetPwd")
+    public Map<String, Object> resetPassword(Integer id) {
+        return userService.resetPassword(id);
+    }
+
     @PostMapping("/add")
     public Map<String, Object> addUser(User user) {
         return userService.addUser(user);

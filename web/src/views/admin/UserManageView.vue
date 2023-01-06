@@ -63,8 +63,11 @@
                        :formatter="(_,__,cell) => formatterUtils.userStatusFmt(cell)" align="center"/>
       <el-table-column label="操作" align="center">
         <template #default="scope">
-          <el-button link type="primary" @click="banOp(scope.row.id, scope.row.status)">
-            {{ scope.row.status == 1 ? "封禁" : (scope.row.status == 0 ? "解禁" : "") }}
+          <el-button v-if="scope.row.status >= 0" link type="primary" @click="banOp(scope.row.id, scope.row.status)">
+            {{ scope.row.status == 1 ? "封禁" : "解禁" }}
+          </el-button>
+          <el-button v-if="scope.row.status >= 0" link type="primary" @click="resetPwd(scope.row.id)">
+            重置密码
           </el-button>
         </template>
       </el-table-column>
@@ -115,7 +118,7 @@
 
 <script setup>
 import {AjaxUtils} from "@/assets/utils/ajaxUtils";
-import {ElMessage} from "element-plus";
+import {ElMessage, ElMessageBox} from "element-plus";
 import {ref, reactive, computed} from "vue";
 import formatterUtils from "@/assets/utils/formatterUtils";
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
@@ -204,6 +207,16 @@ const banOp = (id, st) => {
       ElMessage.success((status == 1 ? "解禁" : "封禁") + "成功")
       getUserList()
     } else ElMessage.error("操作失败")
+  })
+}
+
+const resetPwd = (id) => {
+  AjaxUtils.resetPwd({id}).then(resp => {
+    if (resp.msg !== "success") {
+      ElMessage.error("重置失败！" + resp.msg)
+      return
+    }
+    ElMessageBox.alert("重置成功！密码已重置为 " + resp.data, "提示")
   })
 }
 

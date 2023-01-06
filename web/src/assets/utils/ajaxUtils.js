@@ -11,6 +11,7 @@ const registerUrl = cutUrl + `/user/register`;
 const getInfoUrl = cutUrl + `/user/getinfo`;
 const getUserListUrl = cutUrl + `/user/getuserlist`;
 const updateUserStatusUrl = cutUrl + `/user/updateStatus`;
+const resetUserPwdUrl = cutUrl + `/user/resetPwd`;
 const addUserUrl = cutUrl + `/user/add`;
 
 // app
@@ -31,6 +32,7 @@ const deleteAppEvlUrl = appEvlShortUrl + `/delete`
 const likeAppEvlUrl = appEvlShortUrl + `/like`
 
 export const AjaxUtils = {
+    // user
     login: async (data) => {
         let resp;
         await $.post(getTokenUrl, data, (res) => {
@@ -95,6 +97,17 @@ export const AjaxUtils = {
         return resp;
     },
 
+    async resetPwd(data) {
+        return await $.ajax({
+            url: resetUserPwdUrl,
+            data: data,
+            type: "post",
+            headers: {
+                Authorization: "Bearer " + store.state.user.token
+            }
+        })
+    },
+
     addUser: async (data) => {
         let resp;
         await $.post(addUserUrl, data, (res) => {
@@ -107,6 +120,7 @@ export const AjaxUtils = {
         return await $.get(getAppInfoUrl, data)
     },
 
+    // app
     getAppList: async (data) => {
         let resp;
         await $.get(getAppListUrl, data, (res) => {
@@ -135,6 +149,7 @@ export const AjaxUtils = {
         return await $.post(deleteAppByListUrl, data)
     },
 
+    // appEvl
     async getAppEvlList(data) {
         return await $.ajax({
             url: getAppEvlListUrl,
