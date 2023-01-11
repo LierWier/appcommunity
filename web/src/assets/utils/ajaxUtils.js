@@ -30,6 +30,7 @@ const getAppEvlByLoginUserUrl = appEvlShortUrl + `/getbyloginuser`
 const postAppEvlUrl = appEvlShortUrl + `/post`
 const deleteAppEvlUrl = appEvlShortUrl + `/delete`
 const likeAppEvlUrl = appEvlShortUrl + `/like`
+const getAppEvlListByLoginUserUrl = appEvlShortUrl + `/getListByLoginUser`
 
 export const AjaxUtils = {
     // user
@@ -196,19 +197,16 @@ export const AjaxUtils = {
                 Authorization: "Bearer " + store.state.user.token
             }
         })
-    }
+    },
 
-    // text() {
-    //     const json = []
-    //     for (let i = 100000; i < 100500; i++) {
-    //         const data = {}
-    //         data["username"] = i + ""
-    //         data["password"] = i + ""
-    //         const r = Math.floor(Math.random() * 3)
-    //         if (r === 2) data["sex"] = "男"
-    //         else if (r === 1) data["sex"] = "女"
-    //         json.push(data)
-    //     }
-    //     console.log(JSON.stringify(json))
-    // }
+    async getAppEvlListByLoginUser(data) {
+        return await $.ajax({
+            url: getAppEvlListByLoginUserUrl,
+            data: data,
+            type: "get",
+            headers: {
+                Authorization: "Bearer " + store.state.user.token
+            }
+        })
+    },
 }

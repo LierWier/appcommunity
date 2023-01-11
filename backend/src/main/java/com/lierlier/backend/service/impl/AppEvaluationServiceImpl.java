@@ -229,4 +229,40 @@ public class AppEvaluationServiceImpl implements AppEvaluationService {
         appEvaluation.setLiked(liked);
         appEvaluationMapper.updateById(appEvaluation);
     }
+
+    @Override
+    public Map<String, Object> getAppEvlListByLoginUser(Integer page, Integer pageSize) {
+        Map<String, Object> resp = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        User user;
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+            user = loginUser.getUser();
+        } catch (Exception e) {
+            resp.put("msg", "未登录");
+            return resp;
+        }
+
+        QueryWrapper<AppEvaluation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", user.getId());
+
+        List<AppEvaluation> list;
+        if (page != null && pageSize != null) {
+            IPage<AppEvaluation> iPage = new Page<>(page, pageSize);
+            list = appEvaluationMapper.selectPage(iPage, queryWrapper).getRecords();
+            data.put("total", appEvaluationMapper.selectCount(queryWrapper));
+        } else {
+            list = appEvaluationMapper.selectList(queryWrapper);
+        }
+        for (AppEvaluation item: list) {
+            item.setAppName(appMapper.selectById(item.getAppId()).getAppName());
+        }
+        data.put("list", list);
+
+        resp.put("msg", "success");
+        resp.put("data", data);
+        return resp;
+    }
 }

@@ -40,5 +40,10 @@ public class AppEvaluationController {
     public Map<String, Object> updateLike(Integer id) {
         return appEvaluationService.updateLike(id);
     }
+
+    @GetMapping("/getListByLoginUser")
+    public Map<String, Object> getAppEvlListByLoginUser(Integer page, Integer pageSize) {
+        return appEvaluationService.getAppEvlListByLoginUser(page, pageSize);
+    }
 }
 

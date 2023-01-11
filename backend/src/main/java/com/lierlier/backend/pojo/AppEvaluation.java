@@ -20,6 +20,8 @@ public class AppEvaluation {
     @TableField(exist = false)
     private String userName;
     private Integer appId;
+    @TableField(exist = false)
+    private String appName;
     private Integer score;
     private Integer liked;
     private String content;
