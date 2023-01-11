@@ -11,7 +11,7 @@
         <el-image style="width: 130px; height: 130px" :src="app.appIcon" fit="fill" />
       </div>
       <div class="app_info">
-        <h1 class="app_info_name">{{ app.appName }}</h1>
+        <h4 class="app_info_name fw-bold">{{ app.appName }}</h4>
         <div class="description mt">{{ app.description || "&nbsp;" }}</div>
         <div class="description mt">{{ app.author || "&nbsp;" }}</div>
         <div class="description mt">{{ app.downloads + ' 次下载' }}</div>
@@ -30,15 +30,15 @@
     </div>
     <el-divider />
     <div>
-      <h3>应用介绍</h3>
+      <h5 class="fw-bold">应用介绍</h5>
       <div>
         <pre>{{ app.content || "暂无介绍" }}</pre>
       </div>
     </div>
     <el-divider />
     <div>
-      <h3>评论</h3>
-      <div style="height: 100px;">
+      <h5 class="fw-bold">评论</h5>
+      <div style="height: 100px;" class="mb-5">
         <div class="evl_rate_box evl_rate_box_left">
           <div class="count">{{ app.score }}</div>
           <div class="commentators">{{ data.total }}人评价</div>
@@ -52,7 +52,6 @@
           </div>
         </div>
       </div>
-      <el-divider />
       <div>
         <el-card v-if="!loginUser.is_login" class="evl-card" style="margin: 20px 0">
           <template #header>
@@ -176,7 +175,6 @@ const getAppEvlList = () => {
   }).then(resp => {
     if (resp.msg === "success") {
       appEvls.value = resp.data.appEvls
-      console.log(appEvls.value)
       data.total = resp.data.total
       data.rateCount = rateCountFunc(appEvls.value)
       data.ratePct = ratePctFunc(data.rateCount)

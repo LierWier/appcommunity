@@ -2,9 +2,9 @@
   <div class="common-layout">
     <el-container>
       <el-header class="has-sidebar">
-        <nav-bar />
+        <nav-bar class="container" />
       </el-header>
-      <el-main>
+      <el-main class="container">
         <router-view/>
       </el-main>
       <el-footer>@LIERLIER</el-footer>

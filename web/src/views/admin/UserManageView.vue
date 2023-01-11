@@ -213,20 +213,10 @@ const banOp = (id, st) => {
 const resetPwd = (id) => {
   ElMessageBox.confirm("确认重置密码？", "提示").then(() => {
     AjaxUtils.resetPwd({id}).then(resp => {
-      if (resp.msg !== "success") {
-        ElMessage.error("重置失败！" + resp.msg)
-        return
-      }
-      ElMessageBox.alert("重置成功！密码已重置为 " + resp.data, "提示")
+      if (resp.msg === "success") ElMessageBox.alert("重置成功！密码已重置为 " + resp.data, "提示")
+      else ElMessage.error("重置失败！" + resp.msg)
     })
   })
-  // AjaxUtils.resetPwd({id}).then(resp => {
-  //   if (resp.msg !== "success") {
-  //     ElMessage.error("重置失败！" + resp.msg)
-  //     return
-  //   }
-  //   ElMessageBox.alert("重置成功！密码已重置为 " + resp.data, "提示")
-  // })
 }
 
 const addUser = (form) => {

@@ -25,7 +25,7 @@
       </el-form-item>
     </el-form>
     <el-row :gutter="20">
-      <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" v-for="app in appList" :key="app.id" style="margin-bottom: 20px">
+      <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6" v-for="app in appList" :key="app.id" style="margin-bottom: 20px">
         <el-card shadow="hover" :body-style="{padding: '0px'}">
           <el-row>
             <el-col :span="6">
