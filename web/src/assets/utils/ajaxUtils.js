@@ -13,6 +13,7 @@ const getUserListUrl = cutUrl + `/user/getuserlist`;
 const updateUserStatusUrl = cutUrl + `/user/updateStatus`;
 const resetUserPwdUrl = cutUrl + `/user/resetPwd`;
 const addUserUrl = cutUrl + `/user/add`;
+const updateUserUrl = cutUrl + `/user/update`;
 
 // app
 const getAppListUrl = cutUrl + `/app/getapplist`;
@@ -37,7 +38,6 @@ export const AjaxUtils = {
     login: async (data) => {
         let resp;
         await $.post(getTokenUrl, data, (res) => {
-            console.log(res)
             resp = res;
         })
         return resp;
@@ -117,11 +117,22 @@ export const AjaxUtils = {
         return resp;
     },
 
+    async updateUser(data) {
+        return await $.ajax({
+            url: updateUserUrl,
+            data: data,
+            type: "post",
+            headers: {
+                Authorization: "Bearer " + store.state.user.token
+            }
+        })
+    },
+
+    // app
     async getAppInfo(data) {
         return await $.get(getAppInfoUrl, data)
     },
 
-    // app
     getAppList: async (data) => {
         let resp;
         await $.get(getAppListUrl, data, (res) => {

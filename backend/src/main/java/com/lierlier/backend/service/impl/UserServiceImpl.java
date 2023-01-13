@@ -18,10 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -260,6 +257,50 @@ public class UserServiceImpl implements UserService {
         user.setCreateTime(new Date());
         userMapper.insert(user);
         return map;
+    }
+
+    @Override
+    public Map<String, Object> updateUser(User user) {
+        Map<String, Object> resp = new HashMap<>();
+
+        User loginUser;
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl login = (UserDetailsImpl) authentication.getPrincipal();
+            loginUser = login.getUser();
+        } catch (Exception e) {
+            resp.put("msg", "未登录");
+            return resp;
+        }
+
+        boolean isManager = loginUser.getIsManager() > 0;
+
+        // 非管理员只允许更改自己的信息，且不得修改个别信息
+        if (!isManager && (
+                !Objects.equals(user.getId(), loginUser.getId())
+                || user.getIsManager() != null
+                || user.getStatus() != null
+                || user.getPassword() != null
+        )) {
+            resp.put("msg", "无权限");
+            return resp;
+        }
+        // 任何人都不得更改用户名
+        if (user.getUsername() != null && !Objects.equals(user.getUsername(), loginUser.getUsername())) {
+            resp.put("msg", "用户名不可更改");
+            return resp;
+        }
+        // 任何人都不得更改注册时间，修改密码走另外接口
+        user.setPassword(null);
+        if (user.getCreateTime() != null && user.getCreateTime() != loginUser.getCreateTime()) {
+            resp.put("msg", "非法修改");
+            return resp;
+        }
+
+        userMapper.updateById(user);
+        resp.put("msg", "success");
+        return resp;
     }
 
     private String commonValid(User user) {

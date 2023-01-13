@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="isRegister && '注册' || '登录'" @close="onClose">
+  <el-dialog width="600px" :title="isRegister && '注册' || '登录'" @close="onClose">
     <el-form :model="form" ref="formRef" :rules="rules" hide-required-asterisk v-loading="loading">
       <el-form-item label="用户名" :label-width="formLabelWidth" prop="username">
         <el-input v-model="form.username" autocomplete="off" />
@@ -28,13 +28,12 @@
 
 <script setup>
 import {reactive, ref} from "vue";
-// import {FormInstance, FormRules} from 'element-plus'
 import {AjaxUtils} from "@/assets/utils/ajaxUtils";
 import {ElMessage, ElMessageBox} from "element-plus";
 import store from "@/store";
 import router from "@/router";
 
-const formLabelWidth = ref('150px')
+const formLabelWidth = ref('160px')
 const formRef = ref({});
 const form = reactive({
   username: '',

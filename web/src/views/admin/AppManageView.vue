@@ -75,7 +75,7 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog v-model="appDialogVisible" title="应用信息" @close="appFormRef.resetFields()">
+    <el-dialog v-model="appDialogVisible" title="应用信息" width="600px" @close="appFormRef.resetFields()">
       <el-form :model="appForm" ref="appFormRef" :rules="rules" v-loading="loading">
         <el-form-item label="id" prop="id" v-show="false"></el-form-item>
         <el-form-item label="应用名称" :label-width="formLabelWidth" prop="appName">
@@ -149,7 +149,7 @@ const handleSizeChange = () => {
 const appDialogVisible = ref(false)
 const loading = ref(false)
 const isAdd = ref(true)
-const formLabelWidth = ref("180px")
+const formLabelWidth = ref("160px")
 const appFormRef = ref({})
 const appForm = reactive({
   id: null,

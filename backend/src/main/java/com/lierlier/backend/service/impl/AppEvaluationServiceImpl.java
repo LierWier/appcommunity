@@ -175,6 +175,11 @@ public class AppEvaluationServiceImpl implements AppEvaluationService {
             return resp;
         }
 
+        QueryWrapper<AppEvaluationLikeRecord> wrapper = new QueryWrapper<>();
+        wrapper.eq("app_evaluation_id", id).select("id");
+        List<Object> idList = appEvaluationLikeRecordMapper.selectObjs(wrapper);
+
+        appEvaluationLikeRecordMapper.deleteBatchIds(idList);
         appEvaluationMapper.deleteById(id);
         resp.put("msg", "success");
 
@@ -246,7 +251,7 @@ public class AppEvaluationServiceImpl implements AppEvaluationService {
         }
 
         QueryWrapper<AppEvaluation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", user.getId());
+        queryWrapper.eq("user_id", user.getId()).orderByDesc("create_time");
 
         List<AppEvaluation> list;
         if (page != null && pageSize != null) {

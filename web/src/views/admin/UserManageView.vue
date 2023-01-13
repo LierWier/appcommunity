@@ -73,7 +73,7 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog v-model="addUserDialogVisible" title="添加用户" @close="addUserFormRef.resetFields()">
+    <el-dialog width="600px" v-model="addUserDialogVisible" title="添加用户" @close="addUserFormRef.resetFields()">
       <el-form :model="addUserForm" ref="addUserFormRef" :rules="rules">
         <el-form-item label="用户名" :label-width="formLabelWidth" prop="username">
           <el-input v-model="addUserForm.username" autocomplete="off"/>
@@ -140,7 +140,7 @@ const handleCurrentChange = () => {
 const locale = computed(() => zhCn)
 // 添加用户配置
 const addUserDialogVisible = ref(false)  // 添加用户对话框显示
-const formLabelWidth = "180px"  // 标签宽度
+const formLabelWidth = "160px"  // 标签宽度
 const addUserForm = reactive({username: "", password: "", isManager: null, tel: null, birth: null, sex: null})
 const addUserFormRef = ref({})
 const shortcuts = [

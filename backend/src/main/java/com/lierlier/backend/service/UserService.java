@@ -12,4 +12,5 @@ public interface UserService {
     Map<String, Object> updateStatus(Integer id, Integer status);
     Map<String, Object> resetPassword(Integer id);
     Map<String, Object> addUser(User user);
+    Map<String, Object> updateUser(User user);
 }

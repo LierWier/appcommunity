@@ -1,6 +1,6 @@
 <template>
   <el-card class="box-card">
-    <el-page-header @back="goBack">
+    <el-page-header @back="router.go(-1)">
       <template #content>
         <span class="text-large font-600 mr-3"> 应用详情 </span>
       </template>
@@ -237,9 +237,6 @@ const ratePctFunc = (rateCount) => {
   return ratePct
 }
 
-const goBack = () => {
-  router.go(-1)
-}
 </script>
 
 <style scoped>

@@ -47,4 +47,9 @@ public class UserController {
     public Map<String, Object> addUser(User user) {
         return userService.addUser(user);
     }
+
+    @PostMapping("/update")
+    public Map<String, Object> updateUser(User user) {
+        return userService.updateUser(user);
+    }
 }

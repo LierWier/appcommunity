@@ -3,11 +3,11 @@ package com.lierlier.backend;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+
 @SpringBootTest
 class BackendApplicationTests {
     @Test
     void contextLoads() {
-        System.out.println("````````````````````````App.class````````````````````````");
-
+        System.out.println("````````````````````````test````````````````````````");
     }
 }
