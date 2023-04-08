@@ -9,6 +9,7 @@ import UserManageView from '../views/admin/UserManageView.vue'
 import BlogManageView from '../views/admin/BlogManageView.vue'
 import NewsManageView from '../views/admin/NewsManageView.vue'
 import AppManageView from '../views/admin/AppManageView.vue'
+import BlogView from '../views/square/BlogView'
 import LoginView from '../views/user/LoginView.vue'
 import RegisterView from '../views/user/RegisterView.vue'
 import UserView from '../views/user/UserView.vue'
@@ -33,6 +34,7 @@ const routes = [
             {path: '/admin/appmanageview', name: 'app_manage', component: AppManageView}
         ]
     },
+    {path: '/blog/:id', name: 'blog_content', component: BlogView, meta: {title: "AppHub - Blog"}},
     {path: '/login', name: 'login', component: LoginView},
     {path: '/register', name: 'register', component: RegisterView},
     {path: '/404', name: '404', component: NotFoundView},

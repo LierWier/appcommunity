@@ -23,6 +23,7 @@ const updateAppStatusUrl = cutUrl + `/app/updatestatusbylist`;
 const addAppUrl = cutUrl + `/app/add`;
 const updateAppUrl = cutUrl + `/app/update`;
 const deleteAppByListUrl = cutUrl + `/app/deletebylist`;
+const getTagListUrl = cutUrl + `/app/tag_list`;
 
 // appEvl
 const appEvlShortUrl = cutUrl + `/appevl`;
@@ -32,6 +33,15 @@ const postAppEvlUrl = appEvlShortUrl + `/post`
 const deleteAppEvlUrl = appEvlShortUrl + `/delete`
 const likeAppEvlUrl = appEvlShortUrl + `/like`
 const getAppEvlListByLoginUserUrl = appEvlShortUrl + `/getListByLoginUser`
+
+// blog
+const blogShortUrl = cutUrl + `/blog`;
+const getBlogListUrl = blogShortUrl + `/blog_list`;
+const getBlogUrl = blogShortUrl + `/blog`;
+const getBlogReplyListUrl = blogShortUrl + `/reply_list`;
+const blogUrl = blogShortUrl + `/blog`;
+const replyUrl = blogShortUrl + `/reply`;
+// const getBlogReplyReplyListUrl = blogShortUrl + `/reply_reply_list`;
 
 export const AjaxUtils = {
     // user
@@ -161,6 +171,10 @@ export const AjaxUtils = {
         return await $.post(deleteAppByListUrl, data)
     },
 
+    async getTagList() {
+        return await $.get(getTagListUrl)
+    },
+
     // appEvl
     async getAppEvlList(data) {
         return await $.ajax({
@@ -220,4 +234,43 @@ export const AjaxUtils = {
             }
         })
     },
+
+    // blog
+    async getBlogList (data) {
+        return await $.get(getBlogListUrl, data)
+    },
+
+    async getBlog (data) {
+        return await $.get(getBlogUrl, data)
+    },
+
+    async getBlogReplyList (data) {
+        return await $.get(getBlogReplyListUrl, data)
+    },
+
+    async postBlog (data) {
+        return await $.ajax({
+            url: blogUrl,
+            data: data,
+            type: "post",
+            headers: {
+                Authorization: "Bearer " + store.state.user.token
+            }
+        })
+    },
+
+    async postReply (data) {
+        return await $.ajax({
+            url: replyUrl,
+            data: data,
+            type: "post",
+            headers: {
+                Authorization: "Bearer " + store.state.user.token
+            }
+        })
+    },
+
+    // async getBlogReplyReplyList (data) {
+    //     return await $.get(getBlogReplyListUrl, data)
+    // },
 }

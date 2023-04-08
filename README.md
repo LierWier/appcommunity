@@ -4,7 +4,7 @@
 #### 项目配置：
 - 后端：
     - JDK1.8 
-    - SpringBoot
+    - Spring Boot
     - Mysql
     - MyBatisPlus
     - redis

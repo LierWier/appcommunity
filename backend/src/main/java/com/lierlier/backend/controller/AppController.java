@@ -5,6 +5,7 @@ import com.lierlier.backend.service.AppService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -46,5 +47,14 @@ public class AppController {
     @PostMapping("/updatestatusbylist")
     public Map<String, Object> updateAppStatusByList(@RequestParam(value = "ids[]") Integer[] ids, Integer status) {
         return appService.updateAppStatusByList(ids, status);
+    }
+
+    @GetMapping("/tag_list")
+    public Map<String, Object> getTagList() {
+        Map<String, Object> resp = new HashMap<>();
+        String[] tags = {"游戏", "工具", "购物", "教育", "美食", "社交", "摄影", "生活", "体育", "娱乐", "影音", "新闻", "商务", "儿童", "财务", "图书", "医疗", "旅游"};
+        resp.put("msg", "success");
+        resp.put("data", tags);
+        return resp;
     }
 }
