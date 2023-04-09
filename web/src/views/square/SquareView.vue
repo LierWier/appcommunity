@@ -1,4 +1,20 @@
 <template>
+  <el-form :inline="true" :model="queryForm" class="demo-form-inline">
+    <el-form-item label="标题">
+      <el-input v-model="queryForm.title"/>
+    </el-form-item>
+    <el-form-item label="作者">
+      <el-input v-model="queryForm.authorName"/>
+    </el-form-item>
+    <el-form-item label="标签">
+      <el-select v-model="queryForm.tag" multiple collapse-tags collapse-tags-tooltip style="width: 100%">
+        <el-option v-for="(item,index) in data.tags" :key="index" :label="item" :value="item"/>
+      </el-select>
+    </el-form-item>
+    <el-form-item>
+      <el-button type="primary" @click="getBlogList">搜索</el-button>
+    </el-form-item>
+  </el-form>
   <el-table :data="data.blogs" stripe  >
 <!--    <el-table-column type="index"/>-->
     <el-table-column prop="title" label="标题" width="200" show-overflow-tooltip>
@@ -11,6 +27,7 @@
     <el-table-column prop="tag" label="标签" width="120" show-overflow-tooltip/>
     <el-table-column prop="authorName" label="作者" width="100" show-overflow-tooltip/>
     <el-table-column prop="description" label="描述"  show-overflow-tooltip/>
+    <el-table-column prop="reply" label="回复" width="80"/>
     <el-table-column prop="liked" label="赞" width="50"/>
     <el-table-column prop="unlike" label="踩" width="50"/>
     <el-table-column prop="updateTime" label="活跃时间" width="200"/>
@@ -59,14 +76,20 @@ const data = reactive({
   page: 1, pageSize: 10, total: 10,
   form: {}
 })
-// const form = reactive({})
+const queryForm = reactive({
+  title: "",
+  tag: [],
+  authorName: ""
+})
 
 const getBlogList = () => {
-  AjaxUtils.getBlogList({page: data.page, pageSize: data.pageSize}).then(resp => {
-    if (resp.msg !== "success") {
-      ElMessage.error("获取失败！")
-      return
-    }
+  AjaxUtils.getBlogList({
+    ...queryForm,
+    tag: queryForm.tag.toString(),
+    page: data.page,
+    pageSize: data.pageSize
+  }).then(resp => {
+    if (resp.msg !== "success") return ElMessage.error("获取失败！")
     data.blogs = resp.data.blogs
     data.total = resp.data.total
   }).catch(() => ElMessage.error("网络连接失败！"))

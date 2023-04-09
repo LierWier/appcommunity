@@ -11,5 +11,6 @@ public interface BlogService {
     Map<String, Object> getReplyList(Integer blogId, Integer order);
     Map<String, Object> getReplyReplyList(Integer blogReplyId);
     Map<String, Object> postBlog(Blog blog);
+    Map<String, Object> deleteBlog(Blog blog);
     Map<String, Object> postReply(BlogReply blogReply);
 }

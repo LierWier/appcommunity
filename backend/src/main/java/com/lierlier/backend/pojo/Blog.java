@@ -23,6 +23,7 @@ public class Blog {
     private String description;
     private String tag;
     private String content;
+    private Integer reply;
     private Integer liked;
     private Integer unlike;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")

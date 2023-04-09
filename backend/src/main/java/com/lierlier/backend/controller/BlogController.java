@@ -4,10 +4,7 @@ import com.lierlier.backend.pojo.Blog;
 import com.lierlier.backend.pojo.BlogReply;
 import com.lierlier.backend.service.BlogService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -40,6 +37,11 @@ public class BlogController {
     @PostMapping("/blog")
     public Map<String, Object> postBlog(Blog blog) {
         return blogService.postBlog(blog);
+    }
+
+    @DeleteMapping("/blog")
+    public Map<String, Object> deleteBlog(Blog blog) {
+        return blogService.deleteBlog(blog);
     }
 
     @PostMapping("/reply")

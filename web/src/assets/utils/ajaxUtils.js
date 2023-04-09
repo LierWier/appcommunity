@@ -259,6 +259,17 @@ export const AjaxUtils = {
         })
     },
 
+    async deleteBlog (data) {
+        return await $.ajax({
+            url: blogUrl,
+            data: data,
+            type: "delete",
+            headers: {
+                Authorization: "Bearer " + store.state.user.token
+            }
+        })
+    },
+
     async postReply (data) {
         return await $.ajax({
             url: replyUrl,

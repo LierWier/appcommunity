@@ -139,7 +139,7 @@ const handleCurrentChange = () => {
 // 语言配置
 const locale = computed(() => zhCn)
 // 添加用户配置
-const addUserDialogVisible = ref(false)  // 添加用户对话框显示
+let addUserDialogVisible = ref(false)  // 添加用户对话框显示
 const formLabelWidth = "160px"  // 标签宽度
 const addUserForm = reactive({username: "", password: "", isManager: null, tel: null, birth: null, sex: null})
 const addUserFormRef = ref({})

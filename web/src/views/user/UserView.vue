@@ -120,6 +120,44 @@
         />
       </div>
     </el-card>
+    <el-card class="mt-4">
+      <template #header>
+        <div class="card-header">
+          <span>我的博客</span>
+        </div>
+      </template>
+      <div>
+        <el-table :data="data.blogs" stripe table-layout="auto">
+          <el-table-column fixed type="index" align="center"/>
+          <el-table-column prop="title" label="标题" width="200" show-overflow-tooltip>
+            <template #default="scope">
+              <el-link type="primary" :href="`http://127.0.0.1:8080/blog/${scope.row.id}`" target="_blank" :underline="false">
+                {{scope.row.title}}
+              </el-link>
+            </template>
+          </el-table-column>
+          <el-table-column prop="tag" label="标签" width="120" show-overflow-tooltip/>
+          <el-table-column prop="description" label="描述"  show-overflow-tooltip/>
+          <el-table-column prop="reply" label="回复" width="80"/>
+          <el-table-column prop="liked" label="赞" width="50"/>
+          <el-table-column prop="unlike" label="踩" width="50"/>
+          <el-table-column prop="updateTime" label="活跃时间" width="200"/>
+          <el-table-column label="操作" align="center">
+            <template #default="scope">
+              <el-button link type="danger" @click="deleteBlog(scope.row.id)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+            class="mt-3"
+            v-model:current-page="data.page2"
+            layout="->, prev, pager, next, total"
+            :total="data.total2"
+            @current-change="getMyBlogList"
+            hide-on-single-page
+        />
+      </div>
+    </el-card>
   </div>
 
   <el-dialog v-model="data.dialogVisible" title="个人信息" width="600px" >
@@ -172,6 +210,8 @@ const data = reactive({
   evaluation: [],
   page: 1,
   pageSize: 10,
+  page2: 1,
+  pageSize2: 10
 })
 const formRef = reactive({})
 
@@ -182,8 +222,20 @@ const getAppEvlList = () => {
     data.total = resp.data.total
   }).catch(() => { ElMessage.error("获取评论记录失败！") })
 }
+const getMyBlogList = () => {
+  AjaxUtils.getBlogList({
+    authorId: user.info.id,
+    page: data.page2,
+    pageSize: data.pageSize2
+  }).then(resp => {
+    if (resp.msg !== "success") return ElMessage.error("我的博客获取失败！")
+    data.blogs = resp.data.blogs
+    data.total2 = resp.data.total
+  }).catch(() => ElMessage.error("网络连接失败！"))
+}
 const pageInit = () => {
   getAppEvlList()
+  getMyBlogList()
 }
 pageInit()
 
@@ -213,6 +265,16 @@ const logout = () => {
 const deleteEvl = (id) => {
   ElMessageBox.confirm("确认删除？", "提示").then(() => {
     AjaxUtils.deleteAppEvl({id}).then(resp => {
+      if (resp.msg !== "success") return ElMessage.error("删除失败！" + resp.msg)
+      ElMessage.success("删除成功！")
+      pageInit()
+    }).catch(() => { ElMessage.error("删除失败！") })
+  })
+}
+
+const deleteBlog = (id) => {
+  ElMessageBox.confirm("确认删除？", "提示").then(() => {
+    AjaxUtils.deleteBlog({id}).then(resp => {
       if (resp.msg !== "success") return ElMessage.error("删除失败！" + resp.msg)
       ElMessage.success("删除成功！")
       pageInit()

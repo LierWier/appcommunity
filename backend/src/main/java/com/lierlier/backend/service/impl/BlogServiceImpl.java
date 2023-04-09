@@ -1,6 +1,7 @@
 package com.lierlier.backend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -40,11 +41,20 @@ public class BlogServiceImpl implements BlogService {
         QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
         queryWrapper.gt("status", 0).orderByDesc("update_time");
 
+        if (blog.getAuthorId() != null) queryWrapper.eq("author_id", blog.getAuthorId());
+
         if (StringUtils.isNotEmpty(blog.getAuthorName())) {
             QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
             userQueryWrapper.like("username", blog.getAuthorName()).select("id");
             List<Object> authorIds = userMapper.selectObjs(userQueryWrapper);
             queryWrapper.in("author_id", authorIds);
+        }
+
+        if (StringUtils.isNotEmpty(blog.getTitle())) queryWrapper.like("title", blog.getTitle());
+
+        if (StringUtils.isNotEmpty(blog.getTag())) {
+            String[] tags = blog.getTag().split(",");
+            for (String tag: tags) queryWrapper.like("tag", tag);
         }
 
         List<Blog> blogs;
@@ -134,6 +144,37 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
+    public Map<String, Object> deleteBlog(Blog blog) {
+        Map<String, Object> resp = new HashMap<>();
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+            User user = loginUser.getUser();
+            if (!user.getId().equals(blog.getAuthorId()) && user.getIsManager() < 1) {
+                resp.put("msg", "无权限");
+                return resp;
+            }
+        } catch (Exception e) {
+            resp.put("msg", "未登录");
+            return resp;
+        }
+        blog.setStatus(-1);
+        blogMapper.updateById(blog);
+        deleteReplyWithBlog(blog.getId());
+        resp.put("msg", "success");
+        return resp;
+    }
+
+    private void deleteReplyWithBlog(Integer blogId) {
+        QueryWrapper<BlogReply> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("blog_id", blogId);
+        BlogReply blogReply = new BlogReply();
+        blogReply.setStatus(-1);
+        blogReplyMapper.update(blogReply, queryWrapper);
+    }
+
+    @Override
     public Map<String, Object> postReply(BlogReply blogReply) {
         Map<String, Object> resp = new HashMap<>();
         User user;
@@ -153,7 +194,29 @@ public class BlogServiceImpl implements BlogService {
         blogReply.setUserId(user.getId());
         blogReply.setCreateTime(new Date());
         blogReplyMapper.insert(blogReply);
+        updateBlogReply(blogReply.getBlogId());
+        updateBlog(blogReply.getBlogId());
         resp.put("msg", "success");
         return resp;
+    }
+
+    private void updateBlogReply(Integer id) {
+        QueryWrapper<BlogReply> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("blog_id", id);
+        Blog blog = blogMapper.selectById(id);
+        blog.setReply(Math.toIntExact(blogReplyMapper.selectCount(queryWrapper)));
+        blogMapper.updateById(blog);
+    }
+
+    private void updateBlog(Blog blog) {
+        blog.setUpdateTime(new Date());
+        blogMapper.updateById(blog);
+    }
+
+    private void updateBlog(Integer id) {
+        Blog blog = new Blog();
+        blog.setId(id);
+        blog.setUpdateTime(new Date());
+        blogMapper.updateById(blog);
     }
 }
