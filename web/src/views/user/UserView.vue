@@ -162,6 +162,17 @@
 
   <el-dialog v-model="data.dialogVisible" title="个人信息" width="600px" >
     <el-form :model="data.form" ref="formRef" >
+      <el-form-item label="头像" :label-width="data.formLabelWidth" prop="photo">
+        <el-upload
+            class="avatar-uploader"
+            action="http://127.0.0.1:3001/api/common/upload/cache"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+        >
+          <img v-if="data.imageUrl" :src="data.imageUrl" class="avatar" style="width: 100px; height: 100px;" alt=""/>
+          <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+        </el-upload>
+      </el-form-item>
       <el-form-item label="电话号码" :label-width="data.formLabelWidth" prop="tel"
                     :rules="[{type: 'number', message: '电话号码必须是数字'}]"
       >
@@ -207,6 +218,7 @@ const data = reactive({
   dialogVisible: false,
   formLabelWidth: '160px',
   form: {...utils.deepClone(user.info), tel: ~~user.info.tel || ''},
+  imageUrl: user.info.photo,
   evaluation: [],
   page: 1,
   pageSize: 10,
@@ -257,6 +269,12 @@ const onSubmit = (formRef) => {
   })
 }
 
+const handleAvatarSuccess = (resp, uploadFile) => {
+  data.imageUrl = resp
+  data.form.photo = resp
+  console.log(uploadFile)
+}
+
 const logout = () => {
   store.commit("logout")
   router.push({name: "home"})
@@ -300,5 +318,26 @@ const deleteBlog = (id) => {
 }
 .dialog-footer button:first-child {
   margin-right: 10px;
+}
+
+.avatar-uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
+.el-icon.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 100px;
+  height: 100px;
+  text-align: center;
 }
 </style>

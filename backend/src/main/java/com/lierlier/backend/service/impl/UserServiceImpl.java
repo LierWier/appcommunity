@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lierlier.backend.Constant;
 import com.lierlier.backend.mapper.UserMapper;
 import com.lierlier.backend.pojo.User;
 import com.lierlier.backend.service.UserService;
 import com.lierlier.backend.service.impl.utils.UserDetailsImpl;
+import com.lierlier.backend.utils.FileUploadUtils;
 import com.lierlier.backend.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -296,6 +299,17 @@ public class UserServiceImpl implements UserService {
         if (user.getCreateTime() != null && user.getCreateTime() != loginUser.getCreateTime()) {
             resp.put("msg", "非法修改");
             return resp;
+        }
+
+        if (StringUtils.isNotEmpty(user.getPhoto())) {
+            try {
+                String photo = user.getPhoto();
+                String fileName = user.getId() + photo.substring(photo.length() - 4);
+                String newPhoto = FileUploadUtils.saveFile(fileName, photo, "image/user/avatar/");
+                user.setPhoto(newPhoto);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         userMapper.updateById(user);

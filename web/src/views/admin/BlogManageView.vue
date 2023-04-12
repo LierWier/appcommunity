@@ -45,8 +45,9 @@
       <el-table-column prop="unlike" label="踩" width="50"/>
       <el-table-column prop="createTime" label="发布时间" width="180"/>
       <el-table-column prop="updateTime" label="活跃时间" width="180"/>
-      <el-table-column fixed="right" label="操作" align="center">
+      <el-table-column fixed="right" label="操作" align="center" width="180">
         <template #default="scope">
+          <el-button link type="danger" @click="deleteAndBan(scope.row)">封禁作者并删除</el-button>
           <el-button link type="danger" @click="deleteBlog(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -101,6 +102,16 @@ const deleteBlog = (id) => {
       ElMessage.success("删除成功！")
       getBlogList()
     }).catch(() => { ElMessage.error("删除失败！") })
+  })
+}
+
+const deleteAndBan = (row) => {
+  ElMessageBox.confirm("确认封禁作者？", "提示").then(() => {
+    AjaxUtils.updateUserStatus({id: row.authorId, status: 0}).then(resp => {
+      if (resp.msg !== "success") return ElMessage.error("封禁失败")
+      ElMessage.success( "封禁成功!")
+      deleteBlog(row.id)
+    })
   })
 }
 </script>
