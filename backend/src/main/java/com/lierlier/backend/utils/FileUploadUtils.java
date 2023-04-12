@@ -22,8 +22,9 @@ public class FileUploadUtils {
         FileUtils.copyInputStreamToFile(file.getInputStream(), dest);
     }
 
-    public static String saveFile(String fileName, String fileUrl, String dir) throws IOException {
+    public static String saveFile(String fileUrl, String dir) throws IOException {
         URL url = new URL(fileUrl);
+        String fileName = RenameUtil.renameFileByUUID(fileUrl.substring(fileUrl.length() - 4));
         byte[] imageData = IOUtils.toByteArray(url);
         // 保存文件到磁盘
         Path uploadDir = Paths.get("uploads/" + dir);

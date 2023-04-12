@@ -78,6 +78,17 @@
     <el-dialog v-model="appDialogVisible" title="应用信息" width="600px" @close="appFormRef.resetFields()">
       <el-form :model="appForm" ref="appFormRef" :rules="rules" v-loading="loading">
         <el-form-item label="id" prop="id" v-show="false"></el-form-item>
+        <el-form-item label="图标" :label-width="formLabelWidth" prop="appIcon">
+          <el-upload
+              class="avatar-uploader"
+              action="http://127.0.0.1:3001/api/common/upload/cache"
+              :show-file-list="false"
+              :on-success="resp => appForm.appIcon = resp"
+          >
+            <img v-if="appForm.appIcon" :src="appForm.appIcon" class="avatar" style="width: 100px; height: 100px;" alt=""/>
+            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+          </el-upload>
+        </el-form-item>
         <el-form-item label="应用名称" :label-width="formLabelWidth" prop="appName">
           <el-input v-model.trim="appForm.appName" autocomplete="off"/>
         </el-form-item>
@@ -154,6 +165,7 @@ const appFormRef = ref({})
 const appForm = reactive({
   id: null,
   appName: "",
+  appIcon: "",
   description: "",
   author: "",
   category: "",
@@ -176,6 +188,7 @@ const rules = reactive({
     {required: true, message: '不能为空', trigger: 'blur'}
   ]
 })
+
 const submit = (formRef) => {
   if (isAdd.value) {
     formRef.validate(vld => {
@@ -269,5 +282,26 @@ const updateApp = (row) => {
 
 .el-input {
   width: 300px;
+}
+
+.avatar-uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
+.el-icon.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 100px;
+  height: 100px;
+  text-align: center;
 }
 </style>

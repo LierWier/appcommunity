@@ -8,9 +8,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lierlier.backend.mapper.AppMapper;
 import com.lierlier.backend.pojo.App;
 import com.lierlier.backend.service.AppService;
+import com.lierlier.backend.utils.FileUploadUtils;
+import com.lierlier.backend.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -75,9 +78,20 @@ public class AppServiceImpl implements AppService {
     public Map<String, Object> addApp(App app) {
         HashMap<String, Object> map = new HashMap<>();
         String msg = commonValid(app);
+
+        if (StringUtils.isNotEmpty(app.getAppIcon())) {
+            try {
+                String newIcon = FileUploadUtils.saveFile(app.getAppIcon(), "image/app/icon/");
+                app.setAppIcon(newIcon);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         map.put("msg", msg);
         if (!"success".equals(msg)) return map;
         appMapper.insert(app);
+
         return map;
     }
 
@@ -85,10 +99,16 @@ public class AppServiceImpl implements AppService {
     public Map<String, Object> deleteAppByList(Integer[] ids) {
         HashMap<String, Object> map = new HashMap<>();
         try {
+            for (App app : appMapper.selectBatchIds(Arrays.asList(ids))) {
+                if ((StringUtils.isNotEmpty(app.getAppIcon()))) {
+                    FileUtil.deleteFile(FileUtil.urlToPath(app.getAppIcon()));
+                }
+            }
             appMapper.deleteBatchIds(Arrays.asList(ids));
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            map.put("msg", "删除失败");
+            return map;
         }
         map.put("msg", "success");
         return map;
@@ -97,13 +117,27 @@ public class AppServiceImpl implements AppService {
     @Override
     public Map<String, Object> updateApp(App app) {
         HashMap<String, Object> map = new HashMap<>();
-        if (app.getId() == null) {
+        App oldApp = appMapper.selectById(app.getId());
+        if (oldApp == null) {
             map.put("msg", "ID错误，找不到数据！");
             return map;
         }
         String msg = commonValid(app);
         map.put("msg", msg);
         if (!"success".equals(msg)) return map;
+        if (StringUtils.isNotEmpty(app.getAppIcon())) {
+            try {
+                if (StringUtils.isNotEmpty(oldApp.getAppIcon())
+                        && !FileUtil.deleteFile(FileUtil.urlToPath(oldApp.getAppIcon()))) {
+                    map.put("msg", "图标更换失败");
+                    return map;
+                }
+                String newIcon = FileUploadUtils.saveFile(app.getAppIcon(), "image/app/icon/");
+                app.setAppIcon(newIcon);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         try {
             appMapper.updateById(app);
         } catch (Exception e) {

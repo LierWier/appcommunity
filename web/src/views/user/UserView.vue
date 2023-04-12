@@ -269,10 +269,9 @@ const onSubmit = (formRef) => {
   })
 }
 
-const handleAvatarSuccess = (resp, uploadFile) => {
+const handleAvatarSuccess = (resp) => {
   data.imageUrl = resp
   data.form.photo = resp
-  console.log(uploadFile)
 }
 
 const logout = () => {
