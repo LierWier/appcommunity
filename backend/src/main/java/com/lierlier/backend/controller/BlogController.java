@@ -48,4 +48,15 @@ public class BlogController {
     public Map<String, Object> postReply(BlogReply blogReply) {
         return blogService.postReply(blogReply);
     }
+
+    @GetMapping("/like_or_unlike")
+    public Map<String, Object> getLikeOrUnlike(Integer blogId) {
+        return blogService.getLikeOrUnlike(blogId);
+    }
+
+    @PostMapping("/like_or_unlike")
+    public Map<String, Object> likeOrUnlike(Integer blogId, Integer likeOrUnlike) {
+        // likeOrUnlike: 1: like; 0: unlike
+        return blogService.likeOrUnlike(blogId, likeOrUnlike);
+    }
 }

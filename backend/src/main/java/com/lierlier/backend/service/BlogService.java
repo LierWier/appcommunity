@@ -13,4 +13,6 @@ public interface BlogService {
     Map<String, Object> postBlog(Blog blog);
     Map<String, Object> deleteBlog(Blog blog);
     Map<String, Object> postReply(BlogReply blogReply);
+    Map<String, Object> getLikeOrUnlike(Integer blogId);
+    Map<String, Object> likeOrUnlike(Integer blogId, Integer likeOrUnlike);
 }

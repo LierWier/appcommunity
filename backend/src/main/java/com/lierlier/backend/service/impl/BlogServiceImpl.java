@@ -4,14 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lierlier.backend.mapper.BlogMapper;
-import com.lierlier.backend.mapper.BlogReplyMapper;
-import com.lierlier.backend.mapper.BlogReplyReplyMapper;
-import com.lierlier.backend.mapper.UserMapper;
-import com.lierlier.backend.pojo.Blog;
-import com.lierlier.backend.pojo.BlogReply;
-import com.lierlier.backend.pojo.BlogReplyReply;
-import com.lierlier.backend.pojo.User;
+import com.lierlier.backend.mapper.*;
+import com.lierlier.backend.pojo.*;
 import com.lierlier.backend.service.BlogService;
 import com.lierlier.backend.service.impl.utils.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +25,7 @@ public class BlogServiceImpl implements BlogService {
     private final BlogMapper blogMapper;
     private final BlogReplyMapper blogReplyMapper;
     private final BlogReplyReplyMapper blogReplyReplyMapper;
+    private final BlogLikedRecordMapper blogLikedRecordMapper;
 
     @Override
     public Map<String, Object> getList(Blog blog, Integer page, Integer pageSize) {
@@ -224,6 +219,68 @@ public class BlogServiceImpl implements BlogService {
         Blog blog = new Blog();
         blog.setId(id);
         blog.setUpdateTime(new Date());
+        blogMapper.updateById(blog);
+    }
+
+    @Override
+    public Map<String, Object> getLikeOrUnlike(Integer blogId) {
+        Map<String, Object> resp = new HashMap<>();
+        User user;
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+            user = loginUser.getUser();
+        } catch (Exception e) {
+            resp.put("msg", "未登录");
+            return resp;
+        }
+
+        QueryWrapper<BlogLikedRecord> wrapper = new QueryWrapper<>();
+        wrapper.eq("blog_id", blogId).eq("user_id", user.getId());
+        BlogLikedRecord blogLikedRecord = blogLikedRecordMapper.selectOne(wrapper);
+        Integer status = -1;
+        if (blogLikedRecord != null) status = blogLikedRecord.getLikeOrUnlike();
+        resp.put("msg", "success");
+        resp.put("data", status);
+        return resp;
+    }
+
+    @Override
+    public Map<String, Object> likeOrUnlike(Integer blogId, Integer likeOrUnlike) {
+        Map<String, Object> resp = new HashMap<>();
+        User user;
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+            user = loginUser.getUser();
+        } catch (Exception e) {
+            resp.put("msg", "未登录");
+            return resp;
+        }
+
+        QueryWrapper<BlogLikedRecord> wrapper = new QueryWrapper<>();
+        wrapper.eq("blog_id", blogId).eq("user_id", user.getId());
+        if (blogLikedRecordMapper.selectOne(wrapper) != null) {
+            resp.put("msg", "无法重复操作！");
+            return resp;
+        }
+        BlogLikedRecord blogLikedRecord = new BlogLikedRecord(null, blogId, user.getId(), likeOrUnlike, new Date());
+        blogLikedRecordMapper.insert(blogLikedRecord);
+        updateBlogLikedAndUnlike(blogId);
+        resp.put("msg", "success");
+        return resp;
+    }
+
+    private void updateBlogLikedAndUnlike(Integer id) {
+        Blog blog = blogMapper.selectById(id);
+        QueryWrapper<BlogLikedRecord> likeWrapper = new QueryWrapper<>();
+        likeWrapper.eq("blog_id", id).eq("like_or_unlike", 1);
+        blog.setLiked(Math.toIntExact(blogLikedRecordMapper.selectCount(likeWrapper)));
+        QueryWrapper<BlogLikedRecord> unlikeWrapper = new QueryWrapper<>();
+        unlikeWrapper.eq("blog_id", id).eq("like_or_unlike", 0);
+        blog.setUnlike(Math.toIntExact(blogLikedRecordMapper.selectCount(unlikeWrapper)));
         blogMapper.updateById(blog);
     }
 }

@@ -42,6 +42,7 @@ const getBlogReplyListUrl = blogShortUrl + `/reply_list`;
 const blogUrl = blogShortUrl + `/blog`;
 const replyUrl = blogShortUrl + `/reply`;
 // const getBlogReplyReplyListUrl = blogShortUrl + `/reply_reply_list`;
+const blogLikeOrUnlikeUrl = blogShortUrl + `/like_or_unlike`;
 
 export const AjaxUtils = {
     // user
@@ -284,4 +285,26 @@ export const AjaxUtils = {
     // async getBlogReplyReplyList (data) {
     //     return await $.get(getBlogReplyListUrl, data)
     // },
+
+    async getBlogLikeOrUnlike (data) {
+        return await $.ajax({
+            url: blogLikeOrUnlikeUrl,
+            data: data,
+            type: "get",
+            headers: {
+                Authorization: "Bearer " + store.state.user.token
+            }
+        })
+    },
+
+    async blogLikeOrUnlike (data) {
+        return await $.ajax({
+            url: blogLikeOrUnlikeUrl,
+            data: data,
+            type: "post",
+            headers: {
+                Authorization: "Bearer " + store.state.user.token
+            }
+        })
+    },
 }

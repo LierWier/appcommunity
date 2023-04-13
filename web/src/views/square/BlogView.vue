@@ -15,12 +15,21 @@
               </div>
             </div>
           </div>
-          <div>
-            <div @click="likeOrUnlike(true)">
+          <div v-if="data.likeOrUnlike >= 0">
+            <div>
+              <el-icon :color="data.likeOrUnlike && 'blue' || ''" size="25"><CaretTop /></el-icon>
+            </div>
+            {{ data.blog.liked - data.blog.unlike }}
+            <div>
+              <el-icon :color="!data.likeOrUnlike && 'blue' || ''" size="25"><CaretBottom /></el-icon>
+            </div>
+          </div>
+          <div v-else>
+            <div @click="likeOrUnlike(1)">
               <el-icon size="25"><CaretTop /></el-icon>
             </div>
-            {{ data.blog.liked }}
-            <div @click="likeOrUnlike(false)">
+            {{ data.blog.liked - data.blog.unlike }}
+            <div @click="likeOrUnlike(0)">
               <el-icon size="25"><CaretBottom /></el-icon>
             </div>
           </div>
@@ -89,7 +98,7 @@ const getBlog = () => {
   AjaxUtils.getBlog({id: route.params.id}).then(resp => {
     if (resp.msg !== "success") return ElMessage.error("获取失败！")
     data.blog = resp.data
-    data.blog.tags = data.blog.tag.length && data.blog.tag.split(',') || []
+    data.blog.tags = data.blog.tag && data.blog.tag.split(',') || []
     data.loaded++
   }).catch(() => ElMessage.error("网络连接失败！"))
 }
@@ -101,15 +110,27 @@ const getBlogReplyList = () => {
     data.loaded++
   }).catch(() => ElMessage.error("网络连接失败！"))
 }
+const getBlogLikeOrUnlike = () => {
+  AjaxUtils.getBlogLikeOrUnlike({blogId: route.params.id}).then(resp => {
+    if (resp.msg !== "success") return
+    data.likeOrUnlike = resp.data
+  })
+}
 const getInit = () => {
   getBlog()
   getBlogReplyList()
+  getBlogLikeOrUnlike()
 }
 getInit()
 
-const likeOrUnlike = (x) => {
-  if (x) console.log('like')
-  else console.log('unlike')
+const likeOrUnlike = (likeOrUnlike) => {
+  AjaxUtils.blogLikeOrUnlike({
+    blogId: route.params.id,
+    likeOrUnlike,
+  }).then(resp => {
+    if (resp.msg !== "success") return ElMessage.error(resp.msg)
+    getInit()
+  })
 }
 
 const comment = (id) => {
