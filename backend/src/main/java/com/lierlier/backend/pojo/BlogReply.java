@@ -21,6 +21,8 @@ public class BlogReply {
     private Integer userId;
     @TableField(exist = false)
     private String userName;
+    @TableField(exist = false)
+    private String userPhoto;
     private String content;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private Date createTime;

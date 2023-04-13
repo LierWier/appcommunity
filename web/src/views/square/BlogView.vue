@@ -7,7 +7,7 @@
             <span class="fs-3 me-2">{{ data.blog.title }}</span>
             <el-tag v-for="(tag,index) in data.blog.tags" :key="index" class="ms-2">{{ tag }}</el-tag>
             <div style="display: flex; margin-top: 10px">
-              <el-avatar :size="30" src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png" />
+              <el-avatar :size="30" :src="data.blog.authorPhoto || 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png'" />
               <div>
                 <span class="ms-4 text-primary">{{ data.blog.authorName }}</span>
                 <span class="ms-4 text-secondary">{{ data.blog.createTime }}</span>
@@ -46,7 +46,7 @@
         <template #header>
           <div class="card-header">
             <div style="display: flex">
-              <el-avatar :size="30" src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png" />
+              <el-avatar :size="30" :src="reply.userPhoto || 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png'" />
               <div>
                 <span class="ms-4 text-primary">{{ reply.userName }}</span>
                 <span class="ms-4 text-secondary">{{ reply.createTime }}</span>

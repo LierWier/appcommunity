@@ -65,7 +65,11 @@ public class BlogServiceImpl implements BlogService {
             blogs = blogMapper.selectList(queryWrapper);
         }
 
-        for (Blog b : blogs) b.setAuthorName(userMapper.selectById(b.getAuthorId()).getUsername());
+        for (Blog b : blogs) {
+            User user = userMapper.selectById(b.getAuthorId());
+            b.setAuthorName(user.getUsername());
+            b.setAuthorPhoto(user.getPhoto());
+        }
 
         data.put("blogs", blogs);
         resp.put("msg", "success");
@@ -79,6 +83,7 @@ public class BlogServiceImpl implements BlogService {
         Blog blog = blogMapper.selectById(id);
         User author = userMapper.selectById(blog.getAuthorId());
         blog.setAuthorName(author.getUsername());
+        blog.setAuthorPhoto(author.getPhoto());
         resp.put("msg", "success");
         resp.put("data", blog);
         return resp;
@@ -91,8 +96,11 @@ public class BlogServiceImpl implements BlogService {
         queryWrapper.eq("blog_id", blogId);
         if (order == 1) queryWrapper.orderByDesc("create_time");
         List<BlogReply> replies = blogReplyMapper.selectList(queryWrapper);
-        for (BlogReply reply: replies)
-            reply.setUserName(userMapper.selectById(reply.getUserId()).getUsername());
+        for (BlogReply reply: replies) {
+            User user = userMapper.selectById(reply.getUserId());
+            reply.setUserName(user.getUsername());
+            reply.setUserPhoto(user.getPhoto());
+        }
         resp.put("msg", "success");
         resp.put("data", replies);
         return resp;

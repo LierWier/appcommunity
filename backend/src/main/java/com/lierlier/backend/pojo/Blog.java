@@ -19,6 +19,8 @@ public class Blog {
     private Integer authorId;
     @TableField(exist = false)
     private String authorName;
+    @TableField(exist = false)
+    private String authorPhoto;
     private String title;
     private String description;
     private String tag;

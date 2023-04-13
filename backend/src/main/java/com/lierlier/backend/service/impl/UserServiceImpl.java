@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lierlier.backend.Constant;
 import com.lierlier.backend.mapper.UserMapper;
 import com.lierlier.backend.pojo.User;
 import com.lierlier.backend.service.UserService;
@@ -112,6 +113,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setUsername(username);
         user.setPassword(encodedPassword);
+        user.setPhoto(Constant.userDefaultPhotoUrl);
         user.setCreateTime(new Date());
         userMapper.insert(user);
         map.put("msg", "success");
