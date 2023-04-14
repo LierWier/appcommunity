@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lierlier.backend.Constant;
+import com.lierlier.backend.mapper.UserFollowRecordMapper;
 import com.lierlier.backend.mapper.UserMapper;
 import com.lierlier.backend.pojo.User;
+import com.lierlier.backend.pojo.UserFollowRecord;
 import com.lierlier.backend.service.UserService;
 import com.lierlier.backend.service.impl.utils.UserDetailsImpl;
 import com.lierlier.backend.utils.FileUploadUtils;
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final UserFollowRecordMapper userFollowRecordMapper;
 
     /**
      * 登录 获取 JWT-token
@@ -330,5 +333,113 @@ public class UserServiceImpl implements UserService {
         List<User> users = userMapper.selectList(queryWrapper);
         if (!users.isEmpty()) return "用户名已存在";
         return "success";
+    }
+
+    @Override
+    public Map<String, Object> visitUser(Integer id) {
+        Map<String, Object> resp = new HashMap<>();
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            resp.put("msg", "用户不存在");
+            return resp;
+        }
+        resp.put("data", user);
+        resp.put("msg", "success");
+        return resp;
+    }
+
+    @Override
+    public boolean isFollow(Integer id) {
+        User loginUser;
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl login = (UserDetailsImpl) authentication.getPrincipal();
+            loginUser = login.getUser();
+        } catch (Exception e) {
+            return false;
+        }
+        QueryWrapper<UserFollowRecord> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", id).eq("follower_id", loginUser.getId());
+        return userFollowRecordMapper.selectOne(wrapper) != null;
+    }
+
+    @Override
+    public Map<String, Object> getUserFollow(Integer userId) {
+        Map<String, Object> resp = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        QueryWrapper<UserFollowRecord> fansWrapper = new QueryWrapper<>();
+        fansWrapper.eq("user_id", userId);
+        Long fansCount = userFollowRecordMapper.selectCount(fansWrapper);
+        data.put("fans", fansCount);
+        QueryWrapper<UserFollowRecord> followWrapper = new QueryWrapper<>();
+        followWrapper.eq("follower_id", userId);
+        Long followCount = userFollowRecordMapper.selectCount(followWrapper);
+        data.put("follow", followCount);
+        resp.put("data", data);
+        resp.put("msg", "success");
+        return resp;
+    }
+
+    @Override
+    public Map<String, Object> followUser(Integer id) {
+        Map<String, Object> resp = new HashMap<>();
+        User loginUser;
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl login = (UserDetailsImpl) authentication.getPrincipal();
+            loginUser = login.getUser();
+        } catch (Exception e) {
+            resp.put("msg", "未登录");
+            return resp;
+        }
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            resp.put("msg", "用户不存在");
+            return resp;
+        }
+        if (Objects.equals(id, loginUser.getId())) {
+            resp.put("msg", "不能关注自己");
+            return resp;
+        }
+        if (isFollow(id)) {
+            resp.put("msg", "已经关注了");
+            return resp;
+        }
+        UserFollowRecord userFollowRecord = new UserFollowRecord(null, id, loginUser.getId(), new Date());
+        userFollowRecordMapper.insert(userFollowRecord);
+        resp.put("msg", "success");
+        return resp;
+    }
+
+    @Override
+    public Map<String, Object> cancelFollowUser(Integer id) {
+        Map<String, Object> resp = new HashMap<>();
+        User loginUser;
+        try {
+            UsernamePasswordAuthenticationToken authentication =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl login = (UserDetailsImpl) authentication.getPrincipal();
+            loginUser = login.getUser();
+        } catch (Exception e) {
+            resp.put("msg", "未登录");
+            return resp;
+        }
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            resp.put("msg", "用户不存在");
+            return resp;
+        }
+        QueryWrapper<UserFollowRecord> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", id).eq("follower_id", loginUser.getId());
+        UserFollowRecord userFollowRecord = userFollowRecordMapper.selectOne(wrapper);
+        if (userFollowRecord == null) {
+            resp.put("msg", "还没有关注");
+            return resp;
+        }
+        userFollowRecordMapper.deleteById(userFollowRecord);
+        resp.put("msg", "success");
+        return resp;
     }
 }

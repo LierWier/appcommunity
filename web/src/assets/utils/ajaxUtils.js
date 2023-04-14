@@ -14,6 +14,9 @@ const updateUserStatusUrl = cutUrl + `/user/updateStatus`;
 const resetUserPwdUrl = cutUrl + `/user/resetPwd`;
 const addUserUrl = cutUrl + `/user/add`;
 const updateUserUrl = cutUrl + `/user/update`;
+const isFollowUrl = cutUrl + `/user/is_follow`;
+const visitUserUrl = cutUrl + `/user/visit`;
+const followUrl = cutUrl + `/user/follow`;
 
 // app
 const getAppListUrl = cutUrl + `/app/getapplist`;
@@ -134,6 +137,47 @@ export const AjaxUtils = {
             url: updateUserUrl,
             data: data,
             type: "post",
+            headers: {
+                Authorization: "Bearer " + store.state.user.token
+            }
+        })
+    },
+
+    async visitUser (data) {
+        return await $.get(visitUserUrl, data)
+    },
+
+    async getUserFollow (data) {
+        return await $.get(followUrl, data)
+    },
+
+    async isFollow (data) {
+        return await $.ajax({
+            url: isFollowUrl,
+            data: data,
+            type: "get",
+            headers: {
+                Authorization: "Bearer " + store.state.user.token
+            }
+        })
+    },
+
+    async followUser (data) {
+        return await $.ajax({
+            url: followUrl,
+            data: data,
+            type: "post",
+            headers: {
+                Authorization: "Bearer " + store.state.user.token
+            }
+        })
+    },
+
+    async cancelFollowUser (data) {
+        return await $.ajax({
+            url: followUrl,
+            data: data,
+            type: "delete",
             headers: {
                 Authorization: "Bearer " + store.state.user.token
             }

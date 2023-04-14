@@ -52,4 +52,29 @@ public class UserController {
     public Map<String, Object> updateUser(User user) {
         return userService.updateUser(user);
     }
+
+    @GetMapping("/visit")
+    public Map<String, Object> visitUser(Integer id) {
+        return userService.visitUser(id);
+    }
+
+    @GetMapping("/is_follow")
+    public boolean isFollow(Integer id) {
+        return userService.isFollow(id);
+    }
+
+    @GetMapping("/follow")
+    public Map<String, Object> getUserFollow(Integer userId) {
+        return userService.getUserFollow(userId);
+    }
+
+    @PostMapping("/follow")
+    public Map<String, Object> followUser(Integer id) {
+        return userService.followUser(id);
+    }
+
+    @DeleteMapping("/follow")
+    public Map<String, Object> cancelFollowUser(Integer id) {
+        return userService.cancelFollowUser(id);
+    }
 }

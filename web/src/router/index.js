@@ -13,6 +13,7 @@ import BlogView from '../views/square/BlogView'
 import LoginView from '../views/user/LoginView.vue'
 import RegisterView from '../views/user/RegisterView.vue'
 import UserView from '../views/user/UserView.vue'
+import VisitorView from '../views/user/VisitorView.vue'
 import NotFoundView from '../views/notFound/NotFoundView.vue'
 import TextView from '../views/TextView.vue'
 import {AjaxUtils} from "@/assets/utils/ajaxUtils";
@@ -26,6 +27,7 @@ const routes = [
     {path: '/app', name: 'app', component: AppView, meta: {title: "AppHub - app"}},
     {path: '/app/:id', name: 'app_content', component: AppContentView, meta: {title: "AppHub - app"}},
     {path: '/user', name: 'user', component: UserView, meta: {title: "AppHub - user"}},
+    {path: '/visitor/:id', name: 'visitor', component: VisitorView, meta: {title: "AppHub - visitor"}},
     {
         path: '/admin', name: 'admin', component: AdminView, redirect: '/admin/usermanage', children: [
             {path: '/admin/usermanage', name: 'user_manage', component: UserManageView},

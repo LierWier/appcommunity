@@ -14,9 +14,15 @@
               :column="3"
               size="large"
           >
-            <el-descriptions-item label="关注" label-align="center" align="center" width="100px">123</el-descriptions-item>
-            <el-descriptions-item label="粉丝" label-align="center" align="center" width="100px">123456</el-descriptions-item>
-            <el-descriptions-item label="发布" label-align="center" align="center" width="100px">12</el-descriptions-item>
+            <el-descriptions-item label="关注" label-align="center" align="center" width="100px">
+              {{ data.follows.follow }}
+            </el-descriptions-item>
+            <el-descriptions-item label="粉丝" label-align="center" align="center" width="100px">
+              {{ data.follows.fans }}
+            </el-descriptions-item>
+            <el-descriptions-item label="发布" label-align="center" align="center" width="100px">
+              {{ data.blogs.length }}
+            </el-descriptions-item>
           </el-descriptions>
         </div>
         <el-descriptions
@@ -214,6 +220,8 @@ import utils from "@/assets/utils/utils";
 
 const user = store.state.user
 const data = reactive({
+  follows: {},
+  blogs: [],
   iconStyle: 'marginRight: 6px',
   dialogVisible: false,
   formLabelWidth: '160px',
@@ -227,6 +235,12 @@ const data = reactive({
 })
 const formRef = reactive({})
 
+const getUserFollow = () => {
+  AjaxUtils.getUserFollow({userId: user.info.id}).then(resp => {
+    if (resp.msg !== "success") return ElMessage.error("获取关注和粉丝失败！")
+    data.follows = resp.data
+  })
+}
 const getAppEvlList = () => {
   AjaxUtils.getAppEvlListByLoginUser({page: data.page, pageSize: data.pageSize}).then(resp => {
     if (resp.msg !== 'success') return ElMessage.error("获取评论记录失败！" + resp.msg)
@@ -246,6 +260,7 @@ const getMyBlogList = () => {
   }).catch(() => ElMessage.error("网络连接失败！"))
 }
 const pageInit = () => {
+  getUserFollow()
   getAppEvlList()
   getMyBlogList()
 }

@@ -52,7 +52,13 @@
     >
       <el-table-column type="index" align="center" width="50"/>
       <el-table-column prop="id" label="UID" align="center"/>
-      <el-table-column prop="username" label="用户名" align="center"/>
+      <el-table-column prop="username" label="用户名" align="center">
+        <template #default="scope">
+          <el-link type="primary" :href="`http://127.0.0.1:8080/visitor/${scope.row.id}`" target="_blank" :underline="false">
+            {{scope.row.username}}
+          </el-link>
+        </template>
+      </el-table-column>
       <el-table-column prop="tel" label="电话" align="center"/>
       <el-table-column prop="birth" label="生日" align="center" sortable/>
       <el-table-column prop="sex" label="性别" align="center" sortable/>
