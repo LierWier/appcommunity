@@ -174,4 +174,20 @@ public class AppServiceImpl implements AppService {
         if (!apps.isEmpty()) return "应用名称已存在！";
         return "success";
     }
+
+    @Override
+    public Map<String, Object> getRank() {
+        Map<String, Object> resp = new HashMap<>();
+        QueryWrapper<App> wrapper = new QueryWrapper<>();
+        wrapper.eq("status", 1);
+        List<App> apps = appMapper.selectList(wrapper);
+        for (App app: apps) {
+            app.setRankScore(app.getScore() * app.getDownloads() * 0.01f);
+        }
+        apps.sort((a, b) -> -Float.compare(a.getRankScore(), b.getRankScore()));
+        if (apps.size() > 100) apps.subList(0, 100);
+        resp.put("msg", "success");
+        resp.put("data", apps);
+        return resp;
+    }
 }

@@ -12,4 +12,5 @@ public interface AppService {
     Map<String, Object> deleteAppByList(Integer[] ids);
     Map<String, Object> updateApp(App app);
     Map<String, Object> updateAppStatusByList(Integer[] ids, Integer status);
+    Map<String, Object> getRank();
 }

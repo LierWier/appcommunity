@@ -24,6 +24,8 @@ public class App {
     private String category;
     private String content;
     private Float score;
+    @TableField(exist = false)
+    private Float rankScore;
     private Integer downloads;
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date postTime;

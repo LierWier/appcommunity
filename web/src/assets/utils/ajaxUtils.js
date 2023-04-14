@@ -24,6 +24,7 @@ const addAppUrl = cutUrl + `/app/add`;
 const updateAppUrl = cutUrl + `/app/update`;
 const deleteAppByListUrl = cutUrl + `/app/deletebylist`;
 const getTagListUrl = cutUrl + `/app/tag_list`;
+const appRankUrl = cutUrl + `/app/rank`;
 
 // appEvl
 const appEvlShortUrl = cutUrl + `/appevl`;
@@ -174,6 +175,10 @@ export const AjaxUtils = {
 
     async getTagList() {
         return await $.get(getTagListUrl)
+    },
+
+    async getAppRank() {
+        return await $.get(appRankUrl)
     },
 
     // appEvl

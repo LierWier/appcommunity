@@ -57,4 +57,9 @@ public class AppController {
         resp.put("data", tags);
         return resp;
     }
+
+    @GetMapping("/rank")
+    public Map<String, Object> getRank() {
+        return appService.getRank();
+    }
 }
